@@ -1,0 +1,31 @@
+{
+    "name": "spot2d/csv-transformer",
+    "description": "Transforms partner's csv data file to spot2d format",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Aleksandr Mikhliaiev",
+            "email": "malofan180@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "league/csv": "^9.6",
+        "league/container": "^3.3",
+        "league/flysystem": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.2",
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spot\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spot\\Tests\\": "tests/"
+        }
+    }
+}
