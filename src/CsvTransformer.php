@@ -14,7 +14,9 @@ use League\Flysystem\FilesystemInterface;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\FileMetaData\BadmFileMetaData;
+use Spot\FileMetaData\VentaFileMetaData;
 use Spot\Transformer\Delivery\FromBadmSalesData;
+use Spot\Transformer\Delivery\FromVentaSalesData;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformerStrategy;
 use Spot\Writer\Delivery;
@@ -46,14 +48,14 @@ class CsvTransformer
     {
         $fileMetaData = $this->getFileMetaDataFor($partnerType);
         $reader = Reader::createFromStream($stream);
-        $reader->addStreamFilter('convert.iconv.windows-1251/UTF-8');
         $reader->setDelimiter($fileMetaData->delimiter());
         $reader->setHeaderOffset($fileMetaData->headerOffset());
+        $this->checkForStreamFilter($reader);
 
-        $deliveryTransformer = new FromBadmSalesData();
+        $deliveryTransformer = $this->getDeliveryTransformerFor($partnerType);
 
         foreach ($reader->getRecords() as $record) {
-            $this->deliveryWriter->insertRecord($deliveryTransformer->transformRecord($record));
+            $this->deliveryWriter->insertRecord($deliveryTransformer->transform($record));
         }
 
         $this->deliveryWriter->save();
@@ -66,10 +68,12 @@ class CsvTransformer
 
         //region FileMetaDataStrategy
         $container->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $container->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         //endregion FileMetaDataStrategy
 
         //region ToDeliveryDataTransformerStrategy
         $container->add(FromBadmSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
+        $container->add(FromVentaSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
         //endregion ToDeliveryDataTransformerStrategy
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
@@ -113,5 +117,25 @@ class CsvTransformer
         }
 
         throw new \LogicException(sprintf('DeliveryDataTransformer for partner type "%s" doesn\'t exists', $partnerType));
+    }
+
+    /**
+     * @throws \League\Csv\Exception
+     */
+    private function checkForStreamFilter(Reader $reader): void
+    {
+        // This is ugly solution for windows-1251 encoded files found in stock
+        $encodingList = [
+            'UTF-8',
+            'ASCII',
+            'Windows-1251',
+            'Windows-1252',
+            'Windows-1254',
+        ];
+        $encoding = mb_detect_encoding($reader->getHeader()[0], $encodingList);
+
+        if ($encoding !== 'UTF-8') {
+            $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $encoding));
+        }
     }
 }

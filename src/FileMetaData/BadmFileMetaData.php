@@ -4,20 +4,10 @@ declare(strict_types=1);
 
 namespace Spot\FileMetaData;
 
-class BadmFileMetaData implements FileMetaDataStrategy
+use Spot\PartnerTypes;
+
+final class BadmFileMetaData extends BaseFileMetaData implements FileMetaDataStrategy
 {
-    public const TYPE = 'phizer';
-
-    public function delimiter(): string
-    {
-        return ';';
-    }
-
-    public function headerOffset(): int
-    {
-        return 0;
-    }
-
     public function headerFields(): array
     {
         return [
@@ -47,6 +37,6 @@ class BadmFileMetaData implements FileMetaDataStrategy
 
     public function supports(string $partnerType): bool
     {
-        return self::TYPE === $partnerType;
+        return PartnerTypes::BADM === $partnerType;
     }
 }

@@ -8,4 +8,6 @@ interface FileMetaDataStrategy extends FileMetaData
 {
     public const TAG_NAME = 'file.meta.data.strategy';
     public function supports(string $partnerType): bool;
+    /** @return string[] */
+    public function headerFields(): array;
 }
