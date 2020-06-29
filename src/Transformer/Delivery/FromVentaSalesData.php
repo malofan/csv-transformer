@@ -17,8 +17,8 @@ class FromVentaSalesData extends FromPartnerSalesData implements ToDeliveryDataT
     {
         return [
             'Склад',
-            'Код подразд кл',
-            'Дата накл',
+            'UID пункта доставки',
+            'Дата накладной',
             'Код товара',
             'Количество'
         ];

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Spot\Transformer\Delivery;
 
-use DateTimeImmutable;
-use LogicException;
 use Spot\DTO\DeliveryRecord;
-use Spot\PartnerTypes;
+use Spot\Exception\InvalidRecordException;
 
 abstract class FromPartnerSalesData implements ToDeliveryDataTransformer
 {
@@ -21,6 +19,10 @@ abstract class FromPartnerSalesData implements ToDeliveryDataTransformer
      */
     abstract protected function transformRecord(array $record): DeliveryRecord;
 
+    /**
+     * @param mixed[] $record
+     * @throws InvalidRecordException
+     */
     public function transform(array $record): DeliveryRecord
     {
         $this->assertValidRecord($record);
@@ -34,8 +36,8 @@ abstract class FromPartnerSalesData implements ToDeliveryDataTransformer
     private function assertValidRecord(array $record): void
     {
         foreach ($this->getRequiredRecordFields() as $field) {
-            if (array_key_exists($field, $record)) {
-                new LogicException(sprintf('Field "%s" was not provided in record', $field));
+            if (!array_key_exists($field, $record)) {
+                throw InvalidRecordException::notProvidedField($field);
             }
         }
     }

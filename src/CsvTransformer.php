@@ -52,6 +52,12 @@ class CsvTransformer
         $reader->setHeaderOffset($fileMetaData->headerOffset());
         $this->checkForStreamFilter($reader);
 
+//        var_dump($reader->getHeader());
+//        foreach ($reader->getRecords() as $record) {
+//            var_dump($record);
+//            return;
+//        }
+
         $deliveryTransformer = $this->getDeliveryTransformerFor($partnerType);
 
         foreach ($reader->getRecords() as $record) {
