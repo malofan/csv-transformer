@@ -14,8 +14,10 @@ use League\Flysystem\FilesystemInterface;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\FileMetaData\BadmFileMetaData;
+use Spot\FileMetaData\OptimaFileMetaData;
 use Spot\FileMetaData\VentaFileMetaData;
 use Spot\Transformer\Delivery\FromBadmSalesData;
+use Spot\Transformer\Delivery\FromOptimaSalesData;
 use Spot\Transformer\Delivery\FromVentaSalesData;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformerStrategy;
@@ -75,11 +77,13 @@ class CsvTransformer
         //region FileMetaDataStrategy
         $container->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $container->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $container->add(OptimaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         //endregion FileMetaDataStrategy
 
         //region ToDeliveryDataTransformerStrategy
         $container->add(FromBadmSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
         $container->add(FromVentaSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
+        $container->add(FromOptimaSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
         //endregion ToDeliveryDataTransformerStrategy
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));

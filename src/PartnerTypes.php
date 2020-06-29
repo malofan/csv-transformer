@@ -8,4 +8,5 @@ final class PartnerTypes
 {
     public const BADM = 'badm';
     public const VENTA = 'venta';
+    public const OPTIMA = 'optima';
 }
