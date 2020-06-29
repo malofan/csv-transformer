@@ -7,7 +7,7 @@ namespace Spot\Transformer\Delivery;
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 
-class FromPhizerSalesData implements ToDeliveryDataTransformer
+class FromBadmSalesData implements ToDeliveryDataTransformer
 {
     /**
      * @param mixed[] $record

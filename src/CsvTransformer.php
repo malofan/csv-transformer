@@ -13,8 +13,8 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\FileMetaData\PhizerFileMetaData;
-use Spot\Transformer\Delivery\FromPhizerSalesData;
+use Spot\FileMetaData\BadmFileMetaData;
+use Spot\Transformer\Delivery\FromBadmSalesData;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformerStrategy;
 use Spot\Writer\Delivery;
@@ -50,7 +50,7 @@ class CsvTransformer
         $reader->setDelimiter($fileMetaData->delimiter());
         $reader->setHeaderOffset($fileMetaData->headerOffset());
 
-        $deliveryTransformer = new FromPhizerSalesData();
+        $deliveryTransformer = new FromBadmSalesData();
 
         foreach ($reader->getRecords() as $record) {
             $this->deliveryWriter->insertRecord($deliveryTransformer->transformRecord($record));
@@ -65,11 +65,11 @@ class CsvTransformer
         $container->delegate(new ReflectionContainer());
 
         //region FileMetaDataStrategy
-        $container->add(PhizerFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $container->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         //endregion FileMetaDataStrategy
 
         //region ToDeliveryDataTransformerStrategy
-        $container->add(FromPhizerSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
+        $container->add(FromBadmSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
         //endregion ToDeliveryDataTransformerStrategy
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));

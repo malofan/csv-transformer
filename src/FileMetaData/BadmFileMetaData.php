@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spot\FileMetaData;
 
-class PhizerFileMetaData implements FileMetaDataStrategy
+class BadmFileMetaData implements FileMetaDataStrategy
 {
     public const TYPE = 'phizer';
 
