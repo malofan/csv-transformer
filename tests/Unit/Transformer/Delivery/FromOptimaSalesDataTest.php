@@ -21,7 +21,7 @@ class FromOptimaSalesDataTest extends TestCase
     /**
      * @test
      */
-    public function transform()
+    public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
         (new FromOptimaSalesData())->transform([1, 2, 3]);

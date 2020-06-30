@@ -6,9 +6,12 @@ namespace Spot\Transformer\Delivery;
 
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
+use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
+use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\TransformerStrategy;
 
-class FromOptimaSalesData extends FromPartnerSalesData implements ToDeliveryDataTransformerStrategy
+class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToDeliveryDataTransformer
 {
     /**
      * @return string[]
@@ -30,6 +33,7 @@ class FromOptimaSalesData extends FromPartnerSalesData implements ToDeliveryData
     protected function transformRecord(array $record): DeliveryRecord
     {
         preg_match('/\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
+
         return new DeliveryRecord(
             $record['Филиал'],
             $erpCodeMatch[1] ?? '',
@@ -39,6 +43,15 @@ class FromOptimaSalesData extends FromPartnerSalesData implements ToDeliveryData
             null,
             null
         );
+    }
+
+    /**
+     * @param mixed[] $record
+     * @throws InvalidRecordException
+     */
+    public function transform(array $record): DeliveryRecord
+    {
+        return parent::transform($record);
     }
 
     public function supports(string $partnerType): bool

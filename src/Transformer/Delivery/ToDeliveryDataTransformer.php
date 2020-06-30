@@ -8,6 +8,8 @@ use Spot\DTO\DeliveryRecord;
 
 interface ToDeliveryDataTransformer
 {
+    public const TAG_NAME = 'delivery.data.transformer';
+
     /**
      * @param mixed[] $record
      */

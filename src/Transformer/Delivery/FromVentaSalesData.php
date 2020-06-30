@@ -6,9 +6,12 @@ namespace Spot\Transformer\Delivery;
 
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
+use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
+use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\TransformerStrategy;
 
-class FromVentaSalesData extends FromPartnerSalesData implements ToDeliveryDataTransformerStrategy
+class FromVentaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToDeliveryDataTransformer
 {
     /**
      * @return string[]
@@ -38,6 +41,15 @@ class FromVentaSalesData extends FromPartnerSalesData implements ToDeliveryDataT
             null,
             null
         );
+    }
+
+    /**
+     * @param mixed[] $record
+     * @throws InvalidRecordException
+     */
+    public function transform(array $record): DeliveryRecord
+    {
+        return parent::transform($record);
     }
 
     public function supports(string $partnerType): bool

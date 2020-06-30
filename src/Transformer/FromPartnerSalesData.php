@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer;
 
-use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
 
-abstract class FromPartnerSalesData implements ToDeliveryDataTransformer
+abstract class FromPartnerSalesData
 {
     /**
      * @return string[]
@@ -17,13 +16,13 @@ abstract class FromPartnerSalesData implements ToDeliveryDataTransformer
     /**
      * @param mixed[] $record
      */
-    abstract protected function transformRecord(array $record): DeliveryRecord;
+    abstract protected function transformRecord(array $record); //phpcs:ignore
 
     /**
      * @param mixed[] $record
      * @throws InvalidRecordException
      */
-    public function transform(array $record): DeliveryRecord
+    public function transform(array $record) //phpcs:ignore
     {
         $this->assertValidRecord($record);
 
