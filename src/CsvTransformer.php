@@ -11,22 +11,16 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use Spot\Container\ServiceProvider\DeliveryTransformerServiceProvider;
 use Spot\Container\ServiceProvider\SkuTransformerServiceProvider;
+use Spot\Container\ServiceProvider\TtoptionsTransformerServiceProvider;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\FileMetaData\BadmFileMetaData;
 use Spot\FileMetaData\OptimaFileMetaData;
 use Spot\FileMetaData\VentaFileMetaData;
 use Spot\Transformer\Delivery\DeliveryTransformer;
-use Spot\Transformer\Delivery\FromBadmSalesData as BadmDeliveryTransformer;
-use Spot\Transformer\Delivery\FromOptimaSalesData as OptimaDeliveryTransformer;
-use Spot\Transformer\Delivery\FromVentaSalesData as VentaDeliveryTransformer;
-use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
 use Spot\Transformer\Sku\SkuTransformer;
-use Spot\Transformer\Ttoptions\FromBadmSalesData as BadmTtoptionsTransformer;
-use Spot\Transformer\Ttoptions\FromOptimaSalesData as OptimaTtoptionsTransformer;
-use Spot\Transformer\Ttoptions\FromVentaSalesData as VentaTtoptionsTransformer;
-use Spot\Transformer\Ttoptions\ToTtoptionsDataTransformer;
 use Spot\Transformer\Ttoptions\TtoptionsTransformer;
 use Spot\Writer\Delivery;
 use Spot\Writer\Sku;
@@ -34,8 +28,6 @@ use Spot\Writer\Ttoptions;
 
 class CsvTransformer
 {
-    private const SKU_FILE_NAME = 'sku.csv';
-
     private $fileMetaData;
     private $deliveryTransformerProvider;
     private $ttoptionsTransformerProvider;
@@ -99,24 +91,8 @@ class CsvTransformer
         $container->add(FileMetaData::class)->addArgument($container->get(FileMetaDataStrategy::TAG_NAME));
         //endregion FileMetaDataStrategy
 
-        //region ToDeliveryDataTransformer Strategy
-        $container->add(BadmDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
-        $container->add(OptimaDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
-        $container->add(VentaDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
-        $container->add(DeliveryTransformer::class)->addArgument(
-            $container->get(ToDeliveryDataTransformer::TAG_NAME)
-        );
-        //endregion ToDeliveryDataTransformer Strategy
-
-        //region ToTtoptionsDataTransformer Strategy
-        $container->add(BadmTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
-        $container->add(OptimaTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
-        $container->add(VentaTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
-        $container->add(TtoptionsTransformer::class)->addArgument(
-            $container->get(ToTtoptionsDataTransformer::TAG_NAME)
-        );
-        //endregion ToTtoptionsDataTransformer Strategy
-
+        $container->addServiceProvider(DeliveryTransformerServiceProvider::class);
+        $container->addServiceProvider(TtoptionsTransformerServiceProvider::class);
         $container->addServiceProvider(SkuTransformerServiceProvider::class);
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
