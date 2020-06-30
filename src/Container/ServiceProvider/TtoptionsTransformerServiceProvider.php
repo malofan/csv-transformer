@@ -22,8 +22,6 @@ class TtoptionsTransformerServiceProvider extends AbstractServiceProvider
 
     public function register(): void
     {
-        $this->getContainer()->add('key', 'value');
-
         $this->getContainer()->add(FromBadmSalesData::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
         $this->getContainer()->add(FromOptimaSalesData::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
         $this->getContainer()->add(FromVentaSalesData::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);

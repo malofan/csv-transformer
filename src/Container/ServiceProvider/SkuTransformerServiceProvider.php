@@ -22,8 +22,6 @@ class SkuTransformerServiceProvider extends AbstractServiceProvider
 
     public function register(): void
     {
-        $this->getContainer()->add('key', 'value');
-
         $this->getContainer()->add(FromBadmSalesData::class)->addTag(ToSkuDataTransformer::TAG_NAME);
         $this->getContainer()->add(FromOptimaSalesData::class)->addTag(ToSkuDataTransformer::TAG_NAME);
         $this->getContainer()->add(FromVentaSalesData::class)->addTag(ToSkuDataTransformer::TAG_NAME);

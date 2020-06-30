@@ -12,13 +12,10 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use Spot\Container\ServiceProvider\DeliveryTransformerServiceProvider;
+use Spot\Container\ServiceProvider\FileMetaDataServiceProvider;
 use Spot\Container\ServiceProvider\SkuTransformerServiceProvider;
 use Spot\Container\ServiceProvider\TtoptionsTransformerServiceProvider;
 use Spot\FileMetaData\FileMetaData;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\FileMetaData\BadmFileMetaData;
-use Spot\FileMetaData\OptimaFileMetaData;
-use Spot\FileMetaData\VentaFileMetaData;
 use Spot\Transformer\Delivery\DeliveryTransformer;
 use Spot\Transformer\Sku\SkuTransformer;
 use Spot\Transformer\Ttoptions\TtoptionsTransformer;
@@ -84,13 +81,7 @@ class CsvTransformer
         $container = new Container();
         $container->delegate(new ReflectionContainer());
 
-        //region FileMetaDataStrategy
-        $container->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
-        $container->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
-        $container->add(OptimaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
-        $container->add(FileMetaData::class)->addArgument($container->get(FileMetaDataStrategy::TAG_NAME));
-        //endregion FileMetaDataStrategy
-
+        $container->addServiceProvider(FileMetaDataServiceProvider::class);
         $container->addServiceProvider(DeliveryTransformerServiceProvider::class);
         $container->addServiceProvider(TtoptionsTransformerServiceProvider::class);
         $container->addServiceProvider(SkuTransformerServiceProvider::class);
