@@ -16,31 +16,41 @@ use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\FileMetaData\BadmFileMetaData;
 use Spot\FileMetaData\OptimaFileMetaData;
 use Spot\FileMetaData\VentaFileMetaData;
-use Spot\Transformer\Delivery\FromBadmSalesData;
-use Spot\Transformer\Delivery\FromOptimaSalesData;
-use Spot\Transformer\Delivery\FromVentaSalesData;
+use Spot\Transformer\Delivery\DeliveryTransformer;
+use Spot\Transformer\Delivery\FromBadmSalesData as BadmDeliveryTransformer;
+use Spot\Transformer\Delivery\FromOptimaSalesData as OptimaDeliveryTransformer;
+use Spot\Transformer\Delivery\FromVentaSalesData as VentaDeliveryTransformer;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
-use Spot\Transformer\Delivery\ToDeliveryDataTransformerStrategy;
+use Spot\Transformer\Ttoptions\FromBadmSalesData as BadmTtoptionsTransformer;
+use Spot\Transformer\Ttoptions\FromOptimaSalesData as OptimaTtoptionsTransformer;
+use Spot\Transformer\Ttoptions\FromVentaSalesData as VentaTtoptionsTransformer;
+use Spot\Transformer\Ttoptions\ToTtoptionsDataTransformer;
+use Spot\Transformer\Ttoptions\TtoptionsTransformer;
 use Spot\Writer\Delivery;
+use Spot\Writer\Ttoptions;
 
 class CsvTransformer
 {
-    private const TTOPTIONS_FILE_NAME = 'ttoptiopns.csv';
     private const SKU_FILE_NAME = 'sku.csv';
 
-    private $fileMetaDataSet;
-    private $deliveryTransformers;
+    private $fileMetaData;
+    private $deliveryTransformer;
+    private $ttoptionsTransformer;
     private $deliveryWriter;
+    private $ttoptionsWriter;
 
-    /**
-     * @param FileMetaDataStrategy[] $fileMetaDataSet
-     * @param ToDeliveryDataTransformerStrategy[] $deliveryTransformers
-     */
-    private function __construct(iterable $fileMetaDataSet, iterable $deliveryTransformers, Delivery $deliveryWriter)
-    {
-        $this->fileMetaDataSet = $fileMetaDataSet;
-        $this->deliveryTransformers = $deliveryTransformers;
+    public function __construct(
+        FileMetaData $fileMetaData,
+        DeliveryTransformer $deliveryTransformer,
+        TtoptionsTransformer $ttoptionsTransformer,
+        Delivery $deliveryWriter,
+        Ttoptions $ttoptionsWriter
+    ) {
+        $this->fileMetaData = $fileMetaData;
+        $this->deliveryTransformer = $deliveryTransformer;
+        $this->ttoptionsTransformer = $ttoptionsTransformer;
         $this->deliveryWriter = $deliveryWriter;
+        $this->ttoptionsWriter = $ttoptionsWriter;
     }
 
     /**
@@ -48,25 +58,22 @@ class CsvTransformer
      */
     public function transformSalesData($stream, string $partnerType): void
     {
-        $fileMetaData = $this->getFileMetaDataFor($partnerType);
+        $fileMetaData = $this->fileMetaData->getFor($partnerType);
         $reader = Reader::createFromStream($stream);
         $reader->setDelimiter($fileMetaData->delimiter());
         $reader->setHeaderOffset($fileMetaData->headerOffset());
         $this->checkForStreamFilter($reader);
 
-//        var_dump($reader->getHeader());
-//        foreach ($reader->getRecords() as $record) {
-//            var_dump($record);
-//            return;
-//        }
-
-        $deliveryTransformer = $this->getDeliveryTransformerFor($partnerType);
+        $deliveryTransformer = $this->deliveryTransformer->getFor($partnerType);
+        $ttoptionsTransformer = $this->ttoptionsTransformer->getFor($partnerType);
 
         foreach ($reader->getRecords() as $record) {
             $this->deliveryWriter->insertRecord($deliveryTransformer->transform($record));
+            $this->ttoptionsWriter->insertRecord($ttoptionsTransformer->transform($record));
         }
 
-        $this->deliveryWriter->save();
+        $this->deliveryWriter->save($partnerType . '_' . Delivery::FILE_NAME);
+        $this->ttoptionsWriter->save($partnerType . '_' . Ttoptions::FILE_NAME);
     }
 
     public static function create(string $targetDirectory, ?AdapterInterface $adapter = null): self
@@ -78,21 +85,37 @@ class CsvTransformer
         $container->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $container->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $container->add(OptimaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $container->add(FileMetaData::class)->addArgument($container->get(FileMetaDataStrategy::TAG_NAME));
         //endregion FileMetaDataStrategy
 
-        //region ToDeliveryDataTransformerStrategy
-        $container->add(FromBadmSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
-        $container->add(FromVentaSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
-        $container->add(FromOptimaSalesData::class)->addTag(ToDeliveryDataTransformerStrategy::TAG_NAME);
-        //endregion ToDeliveryDataTransformerStrategy
+        //region ToDeliveryDataTransformer Strategy
+        $container->add(BadmDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $container->add(OptimaDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $container->add(VentaDeliveryTransformer::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $container->add(DeliveryTransformer::class)->addArgument(
+            $container->get(ToDeliveryDataTransformer::TAG_NAME)
+        );
+        //endregion ToDeliveryDataTransformer Strategy
+
+        //region ToTtoptionsDataTransformer Strategy
+        $container->add(BadmTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
+        $container->add(OptimaTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
+        $container->add(VentaTtoptionsTransformer::class)->addTag(ToTtoptionsDataTransformer::TAG_NAME);
+        $container->add(TtoptionsTransformer::class)->addArgument(
+            $container->get(ToTtoptionsDataTransformer::TAG_NAME)
+        );
+        //endregion ToTtoptionsDataTransformer Strategy
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
         $container->add(Delivery::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
+        $container->add(Ttoptions::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
 
         return new self(
-            $container->get(FileMetaDataStrategy::TAG_NAME),
-            $container->get(ToDeliveryDataTransformerStrategy::TAG_NAME),
-            $container->get(Delivery::class)
+            $container->get(FileMetaData::class),
+            $container->get(DeliveryTransformer::class),
+            $container->get(TtoptionsTransformer::class),
+            $container->get(Delivery::class),
+            $container->get(Ttoptions::class)
         );
     }
 
@@ -103,30 +126,6 @@ class CsvTransformer
         }
 
         return new Filesystem($adapter);
-    }
-
-    private function getFileMetaDataFor(string $partnerType): FileMetaData
-    {
-        foreach ($this->fileMetaDataSet as $fileMetaData) {
-            if ($fileMetaData->supports($partnerType)) {
-
-                return $fileMetaData;
-            }
-        }
-
-        throw new \LogicException(sprintf('FileMetaData for partner type "%s" doesn\'t exists', $partnerType));
-    }
-
-    private function getDeliveryTransformerFor(string $partnerType): ToDeliveryDataTransformer
-    {
-        foreach ($this->deliveryTransformers as $transformer) {
-            if ($transformer->supports($partnerType)) {
-
-                return $transformer;
-            }
-        }
-
-        throw new \LogicException(sprintf('DeliveryDataTransformer for partner type "%s" doesn\'t exists', $partnerType));
     }
 
     /**
