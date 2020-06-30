@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spot\Tests\Unit\FileMetaData;
 
 use Spot\FileMetaData\VentaFileMetaData;
