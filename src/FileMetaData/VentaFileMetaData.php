@@ -6,8 +6,11 @@ namespace Spot\FileMetaData;
 
 use Spot\PartnerTypes;
 
-final class VentaFileMetaData extends BaseFileMetaData implements FileMetaDataStrategy
+final class VentaFileMetaData extends BaseFileMetaDataInterface implements FileMetaDataStrategy
 {
+    /**
+     * @return string[]
+     */
     public function headerFields(): array
     {
         return [

@@ -6,8 +6,11 @@ namespace Spot\FileMetaData;
 
 use Spot\PartnerTypes;
 
-final class BadmFileMetaData extends BaseFileMetaData implements FileMetaDataStrategy
+final class BadmFileMetaData extends BaseFileMetaDataInterface implements FileMetaDataStrategy
 {
+    /**
+     * @return string[]
+     */
     public function headerFields(): array
     {
         return [

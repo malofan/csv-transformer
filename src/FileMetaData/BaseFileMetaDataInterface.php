@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spot\FileMetaData;
 
-abstract class BaseFileMetaData implements FileMetaData
+abstract class BaseFileMetaDataInterface implements FileMetaDataInterface
 {
     public function delimiter(): string
     {
