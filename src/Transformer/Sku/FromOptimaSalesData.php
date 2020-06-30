@@ -17,11 +17,7 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
      */
     protected function getRequiredRecordFields(): array
     {
-        return [
-            'Филиал',
-            'Код товара',
-            'Товар',
-        ];
+        return ['Филиал', 'Код товара', 'Товар'];
     }
 
     /**
@@ -31,14 +27,7 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
     {
         preg_match('/(.+)\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
-        return new SkuRecord(
-            $record['Филиал'],
-            $record['Код товара'],
-            $record['Товар'],
-            null,
-            null,
-            null
-        );
+        return new SkuRecord($record['Филиал'], $record['Код товара'], $record['Товар'], null, null, null);
     }
 
     /**

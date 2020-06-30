@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spot\Tests\Unit\Transformer\Delivery;
 
 use Spot\DTO\DeliveryRecord;
@@ -11,9 +13,12 @@ use Spot\Transformer\TransformerStrategy;
 
 class DeliveryTransformerTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $transformer = new class implements TransformerStrategy, ToDeliveryDataTransformer {
+            /**
+             * @param mixed[] $record
+             */
             public function transform(array $record): DeliveryRecord
             {
                 // TODO: Implement transform() method.

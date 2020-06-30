@@ -17,11 +17,7 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
      */
     protected function getRequiredRecordFields(): array
     {
-        return [
-            'Склад',
-            'Код товара',
-            'Товар',
-        ];
+        return ['Склад', 'Код товара', 'Товар'];
     }
 
     /**
@@ -29,14 +25,7 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
      */
     protected function transformRecord(array $record): SkuRecord
     {
-        return new SkuRecord(
-            $record['Склад'],
-            $record['Код товара'],
-            $record['Товар'],
-            null,
-            null,
-            '1 (штука)'
-        );
+        return new SkuRecord($record['Склад'], $record['Код товара'], $record['Товар'], null, null, '1 (штука)');
     }
 
     /**

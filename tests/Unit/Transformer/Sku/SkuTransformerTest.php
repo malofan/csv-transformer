@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spot\Tests\Unit\Transformer\Sku;
 
 use Spot\DTO\SkuRecord;
@@ -11,9 +13,12 @@ use Spot\Transformer\TransformerStrategy;
 
 class SkuTransformerTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $transformer = new class implements TransformerStrategy, ToSkuDataTransformer {
+            /**
+             * @param mixed[] $record
+             */
             public function transform(array $record): SkuRecord
             {
                 // TODO: Implement transform() method.

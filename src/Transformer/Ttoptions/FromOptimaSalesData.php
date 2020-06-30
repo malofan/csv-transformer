@@ -17,12 +17,7 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
      */
     protected function getRequiredRecordFields(): array
     {
-        return [
-            'Филиал',
-            'Дебитор доставки',
-            'Фактический адрес',
-            'ОКПО'
-        ];
+        return ['Филиал', 'Дебитор доставки', 'Фактический адрес', 'ОКПО'];
     }
 
     /**

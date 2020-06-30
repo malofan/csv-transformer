@@ -56,7 +56,7 @@ class CsvTransformer
     /**
      *  $@param resource $stream
      */
-    public function transformSalesData($stream, string $partnerType): void
+    public function transformSalesData($stream, string $partnerType): void // phpcs:ignore
     {
         $fileMetaData = $this->fileMetaData->getFor($partnerType);
         $reader = Reader::createFromStream($stream);
@@ -97,7 +97,9 @@ class CsvTransformer
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
         $container->add(Delivery::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
-        $container->add(Ttoptions::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
+        $container->add(Ttoptions::class)->addArguments(
+            [$container->get(FilesystemInterface::class), $targetDirectory]
+        );
         $container->add(Sku::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
 
         return new self(

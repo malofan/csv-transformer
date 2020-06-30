@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spot\Tests\Unit\Transformer\Ttoptions;
 
 use Spot\DTO\TtoptionsRecord;
@@ -11,9 +13,12 @@ use Spot\Transformer\TransformerStrategy;
 
 class TtoptionsTransformerTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $transformer = new class implements TransformerStrategy, ToTtoptionsDataTransformer {
+            /**
+             * @param mixed[] $record
+             */
             public function transform(array $record): TtoptionsRecord
             {
                 // TODO: Implement transform() method.
