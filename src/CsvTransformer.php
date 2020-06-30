@@ -11,6 +11,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use Spot\Container\ServiceProvider\SkuTransformerServiceProvider;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\FileMetaData\BadmFileMetaData;
@@ -21,12 +22,14 @@ use Spot\Transformer\Delivery\FromBadmSalesData as BadmDeliveryTransformer;
 use Spot\Transformer\Delivery\FromOptimaSalesData as OptimaDeliveryTransformer;
 use Spot\Transformer\Delivery\FromVentaSalesData as VentaDeliveryTransformer;
 use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
+use Spot\Transformer\Sku\SkuTransformer;
 use Spot\Transformer\Ttoptions\FromBadmSalesData as BadmTtoptionsTransformer;
 use Spot\Transformer\Ttoptions\FromOptimaSalesData as OptimaTtoptionsTransformer;
 use Spot\Transformer\Ttoptions\FromVentaSalesData as VentaTtoptionsTransformer;
 use Spot\Transformer\Ttoptions\ToTtoptionsDataTransformer;
 use Spot\Transformer\Ttoptions\TtoptionsTransformer;
 use Spot\Writer\Delivery;
+use Spot\Writer\Sku;
 use Spot\Writer\Ttoptions;
 
 class CsvTransformer
@@ -34,23 +37,28 @@ class CsvTransformer
     private const SKU_FILE_NAME = 'sku.csv';
 
     private $fileMetaData;
-    private $deliveryTransformer;
-    private $ttoptionsTransformer;
+    private $deliveryTransformerProvider;
+    private $ttoptionsTransformerProvider;
     private $deliveryWriter;
     private $ttoptionsWriter;
+    private $skuTransformerProvider;
 
     public function __construct(
         FileMetaData $fileMetaData,
         DeliveryTransformer $deliveryTransformer,
         TtoptionsTransformer $ttoptionsTransformer,
+        SkuTransformer $skuTransformer,
         Delivery $deliveryWriter,
-        Ttoptions $ttoptionsWriter
+        Ttoptions $ttoptionsWriter,
+        Sku $skuWriter
     ) {
         $this->fileMetaData = $fileMetaData;
-        $this->deliveryTransformer = $deliveryTransformer;
-        $this->ttoptionsTransformer = $ttoptionsTransformer;
+        $this->deliveryTransformerProvider = $deliveryTransformer;
+        $this->ttoptionsTransformerProvider = $ttoptionsTransformer;
+        $this->skuTransformerProvider = $skuTransformer;
         $this->deliveryWriter = $deliveryWriter;
         $this->ttoptionsWriter = $ttoptionsWriter;
+        $this->skuWriter = $skuWriter;
     }
 
     /**
@@ -64,16 +72,19 @@ class CsvTransformer
         $reader->setHeaderOffset($fileMetaData->headerOffset());
         $this->checkForStreamFilter($reader);
 
-        $deliveryTransformer = $this->deliveryTransformer->getFor($partnerType);
-        $ttoptionsTransformer = $this->ttoptionsTransformer->getFor($partnerType);
+        $deliveryTransformer = $this->deliveryTransformerProvider->getFor($partnerType);
+        $ttoptionsTransformer = $this->ttoptionsTransformerProvider->getFor($partnerType);
+        $skuTransformer = $this->skuTransformerProvider->getFor($partnerType);
 
         foreach ($reader->getRecords() as $record) {
             $this->deliveryWriter->insertRecord($deliveryTransformer->transform($record));
             $this->ttoptionsWriter->insertRecord($ttoptionsTransformer->transform($record));
+            $this->skuWriter->insertRecord($skuTransformer->transform($record));
         }
 
         $this->deliveryWriter->save($partnerType . '_' . Delivery::FILE_NAME);
         $this->ttoptionsWriter->save($partnerType . '_' . Ttoptions::FILE_NAME);
+        $this->skuWriter->save($partnerType . '_' . Sku::FILE_NAME);
     }
 
     public static function create(string $targetDirectory, ?AdapterInterface $adapter = null): self
@@ -106,16 +117,21 @@ class CsvTransformer
         );
         //endregion ToTtoptionsDataTransformer Strategy
 
+        $container->addServiceProvider(SkuTransformerServiceProvider::class);
+
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
         $container->add(Delivery::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
         $container->add(Ttoptions::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
+        $container->add(Sku::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
 
         return new self(
             $container->get(FileMetaData::class),
             $container->get(DeliveryTransformer::class),
             $container->get(TtoptionsTransformer::class),
+            $container->get(SkuTransformer::class),
             $container->get(Delivery::class),
-            $container->get(Ttoptions::class)
+            $container->get(Ttoptions::class),
+            $container->get(Sku::class)
         );
     }
 
