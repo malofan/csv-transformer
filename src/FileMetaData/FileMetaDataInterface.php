@@ -7,5 +7,5 @@ namespace Spot\FileMetaData;
 interface FileMetaDataInterface
 {
     public function delimiter(): string;
-    public function headerOffset(): int;
+    public function headerOffset(): ?int;
 }

@@ -7,10 +7,10 @@ namespace Spot\Transformer\Sku;
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromVentaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToSkuDataTransformer
+class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSkuDataTransformer
 {
     /**
      * @return string[]

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Spot\Tests\Unit\FileMetaData;
 
-use Spot\FileMetaData\OptimaFileMetaData;
 use PHPUnit\Framework\TestCase;
+use Spot\FileMetaData\OptimaStockFileMetaData;
 
-class OptimaFileMetaDataTest extends TestCase
+class OptimaStockFileMetaDataTest extends TestCase
 {
     /**
      * @test
      */
     public function supports(): void
     {
-        self::assertTrue((new OptimaFileMetaData())->supports('optima'));
+        self::assertTrue((new OptimaStockFileMetaData())->supports('optima', 'stock'));
     }
 }

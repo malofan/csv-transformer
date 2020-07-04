@@ -6,7 +6,7 @@ namespace Spot\FileMetaData;
 
 use Spot\PartnerTypes;
 
-final class OptimaFileMetaData extends BaseFileMetaDataInterface implements FileMetaDataStrategy
+final class OptimaSalesFileMetaData extends BaseFileMetaDataInterface implements FileMetaDataStrategy
 {
     /**
      * @return string[]
@@ -30,8 +30,8 @@ final class OptimaFileMetaData extends BaseFileMetaDataInterface implements File
         ];
     }
 
-    public function supports(string $partnerType): bool
+    public function supports(string $partnerType, string $reportType = null): bool
     {
-        return PartnerTypes::OPTIMA === $partnerType;
+        return PartnerTypes::OPTIMA === $partnerType && FileMetaDataStrategy::REPORT_TYPE_SALES === $reportType;
     }
 }

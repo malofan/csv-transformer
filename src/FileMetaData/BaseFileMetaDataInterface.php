@@ -11,7 +11,7 @@ abstract class BaseFileMetaDataInterface implements FileMetaDataInterface
         return ';';
     }
 
-    public function headerOffset(): int
+    public function headerOffset(): ?int
     {
         return 0;
     }

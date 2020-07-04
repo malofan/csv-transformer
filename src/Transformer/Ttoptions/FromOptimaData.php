@@ -7,10 +7,10 @@ namespace Spot\Transformer\Ttoptions;
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToTtoptionsDataTransformer
+class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToTtoptionsDataTransformer
 {
     /**
      * @return string[]

@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer\Sku;
 
-use DateTimeImmutable;
-use Spot\DTO\DeliveryRecord;
+use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrategy, ToDeliveryDataTransformer
+class FromBadmData extends FromPartnerData implements TransformerStrategy, ToSkuDataTransformer
 {
     /**
      * @return string[]
@@ -20,26 +19,28 @@ class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrat
     {
         return [
             'Склад/филиал',
-            'Код подразд кл',
-            'Дата накл',
             'Код товара',
-            'Количество'
+            'Товар',
+            'Штрих-код товара',
         ];
     }
 
     /**
      * @param mixed[] $record
      */
-    protected function transformRecord(array $record): DeliveryRecord
+    protected function transformRecord(array $record): SkuRecord
     {
-        return new DeliveryRecord(
+        $barcode = strpos($record['Штрих-код товара'], 'E+') !== false
+            ? sprintf('%d', str_replace(',', '.', $record['Штрих-код товара']))
+            : $record['Штрих-код товара'];
+
+        return new SkuRecord(
             $record['Склад/филиал'],
-            $record['Код подразд кл'],
-            DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накл']) ?: null,
             $record['Код товара'],
-            (float)$record['Количество'],
+            $record['Товар'],
+            $barcode,
             null,
-            null
+            '1 (штука)'
         );
     }
 
@@ -47,7 +48,7 @@ class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrat
      * @param mixed[] $record
      * @throws InvalidRecordException
      */
-    public function transform(array $record): DeliveryRecord
+    public function transform(array $record): SkuRecord
     {
         return parent::transform($record);
     }

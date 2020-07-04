@@ -38,7 +38,7 @@ final class BadmFileMetaData extends BaseFileMetaDataInterface implements FileMe
         ];
     }
 
-    public function supports(string $partnerType): bool
+    public function supports(string $partnerType, string $reportType = null): bool
     {
         return PartnerTypes::BADM === $partnerType;
     }

@@ -18,10 +18,10 @@ class FileMetaData
         $this->fileMetaDataSet = $fileMetaDataSet;
     }
 
-    public function getFor(string $partnerType): FileMetaDataInterface
+    public function getFor(string $partnerType, string $reportType): FileMetaDataInterface
     {
         foreach ($this->fileMetaDataSet as $fileMetaData) {
-            if ($fileMetaData->supports($partnerType)) {
+            if ($fileMetaData->supports($partnerType, $reportType)) {
 
                 return $fileMetaData;
             }

@@ -6,7 +6,6 @@ namespace Spot;
 
 use League\Container\Container;
 use League\Container\ReflectionContainer;
-use League\Csv\Reader;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
@@ -14,40 +13,54 @@ use League\Flysystem\FilesystemInterface;
 use Spot\Container\ServiceProvider\DeliveryTransformerServiceProvider;
 use Spot\Container\ServiceProvider\FileMetaDataServiceProvider;
 use Spot\Container\ServiceProvider\SkuTransformerServiceProvider;
+use Spot\Container\ServiceProvider\StockTransformerServiceProvider;
 use Spot\Container\ServiceProvider\TtoptionsTransformerServiceProvider;
 use Spot\FileMetaData\FileMetaData;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\Transformer\Delivery\DeliveryTransformer;
 use Spot\Transformer\Sku\SkuTransformer;
+use Spot\Transformer\Stock\StockTransformer;
 use Spot\Transformer\Ttoptions\TtoptionsTransformer;
 use Spot\Writer\Delivery;
 use Spot\Writer\Sku;
+use Spot\Writer\Stock;
 use Spot\Writer\Ttoptions;
 
 class CsvTransformer
 {
+    private $reader;
     private $fileMetaData;
     private $deliveryTransformerProvider;
     private $ttoptionsTransformerProvider;
+    private $skuTransformerProvider;
+    private $stockTransformer;
     private $deliveryWriter;
     private $ttoptionsWriter;
-    private $skuTransformerProvider;
+    private $skuWriter;
+    private $stockWriter;
 
     public function __construct(
+        Reader $reader,
         FileMetaData $fileMetaData,
         DeliveryTransformer $deliveryTransformer,
         TtoptionsTransformer $ttoptionsTransformer,
         SkuTransformer $skuTransformer,
+        StockTransformer $stockTransformer,
         Delivery $deliveryWriter,
         Ttoptions $ttoptionsWriter,
-        Sku $skuWriter
+        Sku $skuWriter,
+        Stock $stockWriter
     ) {
+        $this->reader = $reader;
         $this->fileMetaData = $fileMetaData;
         $this->deliveryTransformerProvider = $deliveryTransformer;
         $this->ttoptionsTransformerProvider = $ttoptionsTransformer;
         $this->skuTransformerProvider = $skuTransformer;
+        $this->stockTransformer = $stockTransformer;
         $this->deliveryWriter = $deliveryWriter;
         $this->ttoptionsWriter = $ttoptionsWriter;
         $this->skuWriter = $skuWriter;
+        $this->stockWriter = $stockWriter;
     }
 
     /**
@@ -55,17 +68,12 @@ class CsvTransformer
      */
     public function transformSalesData($stream, string $partnerType): void // phpcs:ignore
     {
-        $fileMetaData = $this->fileMetaData->getFor($partnerType);
-        $reader = Reader::createFromStream($stream);
-        $reader->setDelimiter($fileMetaData->delimiter());
-        $reader->setHeaderOffset($fileMetaData->headerOffset());
-        $this->checkForStreamFilter($reader);
-
+        $fileMetaData = $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES);
         $deliveryTransformer = $this->deliveryTransformerProvider->getFor($partnerType);
         $ttoptionsTransformer = $this->ttoptionsTransformerProvider->getFor($partnerType);
         $skuTransformer = $this->skuTransformerProvider->getFor($partnerType);
 
-        foreach ($reader->getRecords() as $record) {
+        foreach ($this->reader->read($stream, $fileMetaData) as $record) {
             $this->deliveryWriter->insertRecord($deliveryTransformer->transform($record));
             $this->ttoptionsWriter->insertRecord($ttoptionsTransformer->transform($record));
             $this->skuWriter->insertRecord($skuTransformer->transform($record));
@@ -74,6 +82,23 @@ class CsvTransformer
         $this->deliveryWriter->save($partnerType . '_' . Delivery::FILE_NAME);
         $this->ttoptionsWriter->save($partnerType . '_' . Ttoptions::FILE_NAME);
         $this->skuWriter->save($partnerType . '_' . Sku::FILE_NAME);
+    }
+
+    /**
+     *  $@param resource $stream
+     */
+    public function transformStockData($stream, string $partnerType): void // phpcs:ignore
+    {
+        $this->stockWriter->insertRecords(
+            $this->stockTransformer->getFor($partnerType)->transformAll(
+                $this->reader->read(
+                    $stream,
+                    $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_STOCK)
+                )
+            )
+        );
+
+        $this->stockWriter->save($partnerType . '_' . Stock::FILE_NAME);
     }
 
     public static function create(string $targetDirectory, ?AdapterInterface $adapter = null): self
@@ -85,6 +110,7 @@ class CsvTransformer
         $container->addServiceProvider(DeliveryTransformerServiceProvider::class);
         $container->addServiceProvider(TtoptionsTransformerServiceProvider::class);
         $container->addServiceProvider(SkuTransformerServiceProvider::class);
+        $container->addServiceProvider(StockTransformerServiceProvider::class);
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
         $container->add(Delivery::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
@@ -92,15 +118,20 @@ class CsvTransformer
             [$container->get(FilesystemInterface::class), $targetDirectory]
         );
         $container->add(Sku::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
+        $container->add(Stock::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
+        $container->add(Reader::class)->addArgument(FileMetaData::class);
 
         return new self(
+            $container->get(Reader::class),
             $container->get(FileMetaData::class),
             $container->get(DeliveryTransformer::class),
             $container->get(TtoptionsTransformer::class),
             $container->get(SkuTransformer::class),
+            $container->get(StockTransformer::class),
             $container->get(Delivery::class),
             $container->get(Ttoptions::class),
-            $container->get(Sku::class)
+            $container->get(Sku::class),
+            $container->get(Stock::class)
         );
     }
 
@@ -111,25 +142,5 @@ class CsvTransformer
         }
 
         return new Filesystem($adapter);
-    }
-
-    /**
-     * @throws \League\Csv\Exception
-     */
-    private function checkForStreamFilter(Reader $reader): void
-    {
-        // This is ugly solution for windows-1251 encoded files found in stock
-        $encodingList = [
-            'UTF-8',
-            'ASCII',
-            'Windows-1251',
-            'Windows-1252',
-            'Windows-1254',
-        ];
-        $encoding = mb_detect_encoding($reader->getHeader()[0], $encodingList);
-
-        if ($encoding !== 'UTF-8') {
-            $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $encoding));
-        }
     }
 }

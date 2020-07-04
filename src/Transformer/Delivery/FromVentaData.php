@@ -8,10 +8,10 @@ use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToDeliveryDataTransformer
+class FromVentaData extends FromPartnerData implements TransformerStrategy, ToDeliveryDataTransformer
 {
     /**
      * @return string[]
@@ -19,11 +19,11 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
     protected function getRequiredRecordFields(): array
     {
         return [
-            'Филиал',
-            'Дебитор доставки',
-            'День',
+            'Склад',
+            'UID пункта доставки',
+            'Дата накладной',
             'Код товара',
-            'Продажи шт'
+            'Количество'
         ];
     }
 
@@ -32,14 +32,12 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
      */
     protected function transformRecord(array $record): DeliveryRecord
     {
-        preg_match('/\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
-
         return new DeliveryRecord(
-            $record['Филиал'],
-            $erpCodeMatch[1] ?? '',
-            DateTimeImmutable::createFromFormat('d.m.Y', $record['День']) ?: null,
+            $record['Склад'],
+            $record['UID пункта доставки'],
+            DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накладной']) ?: null,
             $record['Код товара'],
-            (float)$record['Продажи шт'],
+            (float)$record['Количество'],
             null,
             null
         );
@@ -56,6 +54,6 @@ class FromOptimaSalesData extends FromPartnerSalesData implements TransformerStr
 
     public function supports(string $partnerType): bool
     {
-        return PartnerTypes::OPTIMA === $partnerType;
+        return PartnerTypes::VENTA === $partnerType;
     }
 }

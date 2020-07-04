@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer\Ttoptions;
 
-use DateTimeImmutable;
-use Spot\DTO\DeliveryRecord;
+use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromVentaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToDeliveryDataTransformer
+class FromVentaData extends FromPartnerData implements TransformerStrategy, ToTtoptionsDataTransformer
 {
     /**
      * @return string[]
@@ -21,25 +20,23 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
         return [
             'Склад',
             'UID пункта доставки',
-            'Дата накладной',
-            'Код товара',
-            'Количество'
+            'Клиент',
+            'Адрес дост.',
+            'ОКПО'
         ];
     }
 
     /**
      * @param mixed[] $record
      */
-    protected function transformRecord(array $record): DeliveryRecord
+    protected function transformRecord(array $record): TtoptionsRecord
     {
-        return new DeliveryRecord(
+        return new TtoptionsRecord(
             $record['Склад'],
             $record['UID пункта доставки'],
-            DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накладной']) ?: null,
-            $record['Код товара'],
-            (float)$record['Количество'],
-            null,
-            null
+            $record['Клиент'],
+            $record['Адрес дост.'],
+            $record['ОКПО']
         );
     }
 
@@ -47,7 +44,7 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
      * @param mixed[] $record
      * @throws InvalidRecordException
      */
-    public function transform(array $record): DeliveryRecord
+    public function transform(array $record): TtoptionsRecord
     {
         return parent::transform($record);
     }

@@ -8,7 +8,8 @@ use League\Container\ServiceProvider\AbstractServiceProvider;
 use Spot\FileMetaData\BadmFileMetaData;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\FileMetaData\OptimaFileMetaData;
+use Spot\FileMetaData\OptimaSalesFileMetaData;
+use Spot\FileMetaData\OptimaStockFileMetaData;
 use Spot\FileMetaData\VentaFileMetaData;
 
 class FileMetaDataServiceProvider extends AbstractServiceProvider
@@ -16,7 +17,8 @@ class FileMetaDataServiceProvider extends AbstractServiceProvider
     protected $provides = [
         BadmFileMetaData::class,
         VentaFileMetaData::class,
-        OptimaFileMetaData::class,
+        OptimaSalesFileMetaData::class,
+        OptimaStockFileMetaData::class,
         FileMetaData::class,
     ];
 
@@ -24,7 +26,7 @@ class FileMetaDataServiceProvider extends AbstractServiceProvider
     {
         $this->getContainer()->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $this->getContainer()->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
-        $this->getContainer()->add(OptimaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $this->getContainer()->add(OptimaSalesFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $this->getContainer()->add(FileMetaData::class)->addArgument(
             $this->getContainer()->get(FileMetaDataStrategy::TAG_NAME)
         );

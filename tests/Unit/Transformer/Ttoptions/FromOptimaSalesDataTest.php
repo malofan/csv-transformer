@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\Tests\Unit\Transformer\Ttoptions;
 
 use Spot\Exception\InvalidRecordException;
-use Spot\Transformer\Ttoptions\FromOptimaSalesData;
+use Spot\Transformer\Ttoptions\FromOptimaData;
 use PHPUnit\Framework\TestCase;
 
 class FromOptimaSalesDataTest extends TestCase
@@ -15,7 +15,7 @@ class FromOptimaSalesDataTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue((new FromOptimaSalesData())->supports('optima'));
+        self::assertTrue((new FromOptimaData())->supports('optima'));
     }
 
     /**
@@ -24,6 +24,6 @@ class FromOptimaSalesDataTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromOptimaSalesData())->transform([1, 2, 3]);
+        (new FromOptimaData())->transform([1, 2, 3]);
     }
 }

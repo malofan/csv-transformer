@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Ttoptions;
+namespace Spot\Transformer\Delivery;
 
-use Spot\DTO\TtoptionsRecord;
+use DateTimeImmutable;
+use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrategy, ToTtoptionsDataTransformer
+class FromBadmData extends FromPartnerData implements TransformerStrategy, ToDeliveryDataTransformer
 {
     /**
      * @return string[]
@@ -20,23 +21,25 @@ class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrat
         return [
             'Склад/филиал',
             'Код подразд кл',
-            'Клиент',
-            'Факт.адрес доставки',
-            'ОКПО клиента'
+            'Дата накл',
+            'Код товара',
+            'Количество'
         ];
     }
 
     /**
      * @param mixed[] $record
      */
-    protected function transformRecord(array $record): TtoptionsRecord
+    protected function transformRecord(array $record): DeliveryRecord
     {
-        return new TtoptionsRecord(
+        return new DeliveryRecord(
             $record['Склад/филиал'],
             $record['Код подразд кл'],
-            $record['Клиент'],
-            $record['Факт.адрес доставки'],
-            $record['ОКПО клиента']
+            DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накл']) ?: null,
+            $record['Код товара'],
+            (float)$record['Количество'],
+            null,
+            null
         );
     }
 
@@ -44,7 +47,7 @@ class FromBadmSalesData extends FromPartnerSalesData implements TransformerStrat
      * @param mixed[] $record
      * @throws InvalidRecordException
      */
-    public function transform(array $record): TtoptionsRecord
+    public function transform(array $record): DeliveryRecord
     {
         return parent::transform($record);
     }

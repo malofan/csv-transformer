@@ -7,10 +7,10 @@ namespace Spot\Transformer\Ttoptions;
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerSalesData;
+use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
 
-class FromVentaSalesData extends FromPartnerSalesData implements TransformerStrategy, ToTtoptionsDataTransformer
+class FromBadmData extends FromPartnerData implements TransformerStrategy, ToTtoptionsDataTransformer
 {
     /**
      * @return string[]
@@ -18,11 +18,11 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
     protected function getRequiredRecordFields(): array
     {
         return [
-            'Склад',
-            'UID пункта доставки',
+            'Склад/филиал',
+            'Код подразд кл',
             'Клиент',
-            'Адрес дост.',
-            'ОКПО'
+            'Факт.адрес доставки',
+            'ОКПО клиента'
         ];
     }
 
@@ -32,11 +32,11 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
     protected function transformRecord(array $record): TtoptionsRecord
     {
         return new TtoptionsRecord(
-            $record['Склад'],
-            $record['UID пункта доставки'],
+            $record['Склад/филиал'],
+            $record['Код подразд кл'],
             $record['Клиент'],
-            $record['Адрес дост.'],
-            $record['ОКПО']
+            $record['Факт.адрес доставки'],
+            $record['ОКПО клиента']
         );
     }
 
@@ -51,6 +51,6 @@ class FromVentaSalesData extends FromPartnerSalesData implements TransformerStra
 
     public function supports(string $partnerType): bool
     {
-        return PartnerTypes::VENTA === $partnerType;
+        return PartnerTypes::BADM === $partnerType;
     }
 }

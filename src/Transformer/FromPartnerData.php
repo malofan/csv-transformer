@@ -6,7 +6,7 @@ namespace Spot\Transformer;
 
 use Spot\Exception\InvalidRecordException;
 
-abstract class FromPartnerSalesData
+abstract class FromPartnerData
 {
     /**
      * @return string[]

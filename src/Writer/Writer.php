@@ -38,6 +38,7 @@ abstract class Writer
         if ($this->filesystem->has($filePath)) {
             $this->filesystem->delete($filePath);
         }
+
         $this->filesystem->writeStream($filePath, $this->stream);
     }
 }
