@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\DTO;
 
 /**
- * @property-read string $distributorId
+ * @property-read int $distributorId
  * @property-read string $clientERPCode
  * @property-read string $clientName
  * @property-read string $clientAddress
@@ -20,7 +20,7 @@ class TtoptionsRecord
     public $okpo;
 
     public function __construct(
-        string $distributorId,
+        int $distributorId,
         string $clientERPCode,
         string $clientName,
         string $clientAddress,

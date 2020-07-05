@@ -27,6 +27,7 @@ class FileMetaDataServiceProvider extends AbstractServiceProvider
         $this->getContainer()->add(BadmFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $this->getContainer()->add(VentaFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $this->getContainer()->add(OptimaSalesFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
+        $this->getContainer()->add(OptimaStockFileMetaData::class)->addTag(FileMetaDataStrategy::TAG_NAME);
         $this->getContainer()->add(FileMetaData::class)->addArgument(
             $this->getContainer()->get(FileMetaDataStrategy::TAG_NAME)
         );

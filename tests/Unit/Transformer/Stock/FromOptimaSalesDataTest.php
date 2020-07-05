@@ -6,6 +6,7 @@ namespace Spot\Tests\Unit\Transformer\Stock;
 
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromOptimaData;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class FromOptimaSalesDataTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue((new FromOptimaData())->supports('optima'));
+        self::assertTrue((new FromOptimaData($this->createMock(DistributorRepository::class)))->supports('optima'));
     }
 
     /**
@@ -25,7 +26,7 @@ class FromOptimaSalesDataTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromOptimaData())->transform([1, 2, 3], [1, 2, 3])->current();
+        (new FromOptimaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3], [1, 2, 3])->current();
     }
 
     /**
@@ -39,11 +40,14 @@ class FromOptimaSalesDataTest extends TestCase
             ['БЕКОНАЗЕ СПРЕЙ 50МКГ/Д 180ДОЗ', '12654', '324.00', '12.00', '654.00']
         ];
 
+        $repo = $this->createMock(DistributorRepository::class);
+        $repo->method('getIdBy')->willReturn(10);
+
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new FromOptimaData())->transformAll(new \ArrayIterator($records))->current();
+        $stockRecord = (new FromOptimaData($repo))->transformAll(new \ArrayIterator($records))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
-        $this->assertSame('Название Филиала', $stockRecord->distributorId);
+        $this->assertSame(10, $stockRecord->distributorId);
         $this->assertSame(336, $stockRecord->qty);
     }
 }

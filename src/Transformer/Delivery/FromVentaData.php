@@ -7,6 +7,7 @@ namespace Spot\Transformer\Delivery;
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -33,7 +34,11 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToDe
     protected function transformRecord(array $record): DeliveryRecord
     {
         return new DeliveryRecord(
-            $record['Склад'],
+            $this->distributorRepository->getIdBy(
+                $record['Склад'],
+                PartnerTypes::VENTA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $record['UID пункта доставки'],
             DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накладной']) ?: null,
             $record['Код товара'],

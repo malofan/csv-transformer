@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Iterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -33,7 +34,11 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSt
             }
 
             yield new StockRecord(
-                $fieldName,
+                $this->distributorRepository->getIdBy(
+                    $fieldName,
+                    PartnerTypes::VENTA,
+                    FileMetaDataStrategy::REPORT_TYPE_STOCK
+                ),
                 new DateTimeImmutable(),
                 $record['Наименование Препарата'],
                 (int)$value,

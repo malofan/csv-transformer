@@ -7,6 +7,7 @@ namespace Spot\Transformer\Delivery;
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -35,7 +36,11 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToD
         preg_match('/\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
         return new DeliveryRecord(
-            $record['Филиал'],
+            $this->distributorRepository->getIdBy(
+                $record['Филиал'],
+                PartnerTypes::OPTIMA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $erpCodeMatch[1] ?? '',
             DateTimeImmutable::createFromFormat('d.m.Y', $record['День']) ?: null,
             $record['Код товара'],

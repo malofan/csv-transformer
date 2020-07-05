@@ -6,6 +6,7 @@ namespace Spot\Transformer\Ttoptions;
 
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -28,7 +29,11 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToT
         preg_match('/(.+)\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
         return new TtoptionsRecord(
-            $record['Филиал'],
+            $this->distributorRepository->getIdBy(
+                $record['Филиал'],
+                PartnerTypes::OPTIMA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $erpCodeMatch[2] ?? '',
             trim($erpCodeMatch[1] ?? ''),
             $record['Фактический адрес'],

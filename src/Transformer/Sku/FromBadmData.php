@@ -6,6 +6,7 @@ namespace Spot\Transformer\Sku;
 
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -35,7 +36,11 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToSku
             : $record['Штрих-код товара'];
 
         return new SkuRecord(
-            $record['Склад/филиал'],
+            $this->distributorRepository->getIdBy(
+                $record['Склад/филиал'],
+                PartnerTypes::BADM,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $record['Код товара'],
             $record['Товар'],
             $barcode,

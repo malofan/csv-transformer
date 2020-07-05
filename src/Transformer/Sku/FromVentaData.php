@@ -6,6 +6,7 @@ namespace Spot\Transformer\Sku;
 
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -25,7 +26,18 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSk
      */
     protected function transformRecord(array $record): SkuRecord
     {
-        return new SkuRecord($record['Склад'], $record['Код товара'], $record['Товар'], null, null, '1 (штука)');
+        return new SkuRecord(
+            $this->distributorRepository->getIdBy(
+                $record['Склад'],
+                PartnerTypes::VENTA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
+            $record['Код товара'],
+            $record['Товар'],
+            null,
+            null,
+            '1 (штука)'
+        );
     }
 
     /**

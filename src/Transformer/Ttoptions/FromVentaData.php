@@ -6,6 +6,7 @@ namespace Spot\Transformer\Ttoptions;
 
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -32,7 +33,11 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToTt
     protected function transformRecord(array $record): TtoptionsRecord
     {
         return new TtoptionsRecord(
-            $record['Склад'],
+            $this->distributorRepository->getIdBy(
+                $record['Склад'],
+                PartnerTypes::VENTA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $record['UID пункта доставки'],
             $record['Клиент'],
             $record['Адрес дост.'],

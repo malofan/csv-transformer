@@ -6,6 +6,7 @@ namespace Spot\Transformer\Sku;
 
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -27,7 +28,18 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToS
     {
         preg_match('/(.+)\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
-        return new SkuRecord($record['Филиал'], $record['Код товара'], $record['Товар'], null, null, null);
+        return new SkuRecord(
+            $this->distributorRepository->getIdBy(
+                $record['Филиал'],
+                PartnerTypes::OPTIMA,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
+            $record['Код товара'],
+            $record['Товар'],
+            null,
+            null,
+            null
+        );
     }
 
     /**

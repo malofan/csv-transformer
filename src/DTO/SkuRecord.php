@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\DTO;
 
 /**
- * @property-read string $distributorId
+ * @property-read int $distributorId
  * @property-read string $distributorProductCode
  * @property-read string $productName
  * @property-read string|null $barcode
@@ -22,7 +22,7 @@ class SkuRecord
     public $units;
 
     public function __construct(
-        string $distributorId,
+        int $distributorId,
         string $distributorProductCode,
         string $productName,
         ?string $barcode,

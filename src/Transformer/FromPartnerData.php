@@ -5,9 +5,17 @@ declare(strict_types=1);
 namespace Spot\Transformer;
 
 use Spot\Exception\InvalidRecordException;
+use Spot\Repository\DistributorRepository;
 
 abstract class FromPartnerData
 {
+    protected $distributorRepository;
+
+    public function __construct(DistributorRepository $distributorRepository)
+    {
+        $this->distributorRepository = $distributorRepository;
+    }
+
     /**
      * @return string[]
      */

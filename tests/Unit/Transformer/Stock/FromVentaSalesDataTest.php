@@ -6,6 +6,7 @@ namespace Spot\Tests\Unit\Transformer\Stock;
 
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromVentaData;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class FromVentaSalesDataTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue((new FromVentaData())->supports('venta'));
+        self::assertTrue((new FromVentaData($this->createMock(DistributorRepository::class)))->supports('venta'));
     }
 
     /**
@@ -25,7 +26,7 @@ class FromVentaSalesDataTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromVentaData())->transform([1, 2, 3]);
+        (new FromVentaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -40,11 +41,13 @@ class FromVentaSalesDataTest extends TestCase
             'Общий остаток' => '23'
         ];
 
+        $repo = $this->createMock(DistributorRepository::class);
+        $repo->method('getIdBy')->willReturn(10);
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new FromVentaData())->transformAll(new \ArrayIterator([$record]))->current();
+        $stockRecord = (new FromVentaData($repo))->transformAll(new \ArrayIterator([$record]))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
-        $this->assertSame('Название Филиала', $stockRecord->distributorId);
+        $this->assertSame(10, $stockRecord->distributorId);
         $this->assertSame(123, $stockRecord->qty);
     }
 }

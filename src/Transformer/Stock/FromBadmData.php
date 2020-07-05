@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Iterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -33,7 +34,11 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToSto
     protected function transformRecord(array $record): StockRecord
     {
         return new StockRecord(
-            $record['Филиал'],
+            $this->distributorRepository->getIdBy(
+                $record['Филиал'],
+                PartnerTypes::BADM,
+                FileMetaDataStrategy::REPORT_TYPE_STOCK
+            ),
             new DateTimeImmutable(),
             $record['Код товара'],
             (int)$record['Количество реальное'],

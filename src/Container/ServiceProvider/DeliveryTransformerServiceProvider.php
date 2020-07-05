@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spot\Container\ServiceProvider;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Delivery\FromBadmData;
 use Spot\Transformer\Delivery\FromOptimaData;
 use Spot\Transformer\Delivery\FromVentaData;
@@ -22,9 +23,18 @@ class DeliveryTransformerServiceProvider extends AbstractServiceProvider
 
     public function register(): void
     {
-        $this->getContainer()->add(FromBadmData::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
-        $this->getContainer()->add(FromOptimaData::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
-        $this->getContainer()->add(FromVentaData::class)->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromBadmData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromOptimaData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToDeliveryDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromVentaData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToDeliveryDataTransformer::TAG_NAME);
         $this->getContainer()->add(DeliveryTransformer::class)->addArgument(
             $this->getContainer()->get(ToDeliveryDataTransformer::TAG_NAME)
         );

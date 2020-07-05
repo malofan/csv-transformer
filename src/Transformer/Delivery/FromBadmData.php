@@ -7,6 +7,7 @@ namespace Spot\Transformer\Delivery;
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 use Spot\Transformer\FromPartnerData;
 use Spot\Transformer\TransformerStrategy;
@@ -33,7 +34,11 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToDel
     protected function transformRecord(array $record): DeliveryRecord
     {
         return new DeliveryRecord(
-            $record['Склад/филиал'],
+            $this->distributorRepository->getIdBy(
+                $record['Склад/филиал'],
+                PartnerTypes::BADM,
+                FileMetaDataStrategy::REPORT_TYPE_SALES
+            ),
             $record['Код подразд кл'],
             DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накл']) ?: null,
             $record['Код товара'],

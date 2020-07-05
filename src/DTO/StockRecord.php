@@ -7,7 +7,7 @@ namespace Spot\DTO;
 use DateTimeImmutable;
 
 /**
- * @property-read string $distributorId
+ * @property-read int $distributorId
  * @property-read DateTimeImmutable $date
  * @property-read string $distributorProductCode
  * @property-read int $qty
@@ -26,7 +26,7 @@ class StockRecord
     public $manufactureDate;
 
     public function __construct(
-        string $distributorId,
+        int $distributorId,
         DateTimeImmutable $date,
         string $distributorProductCode,
         int $qty,

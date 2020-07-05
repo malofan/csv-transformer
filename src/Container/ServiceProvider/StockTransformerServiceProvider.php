@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spot\Container\ServiceProvider;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromBadmData;
 use Spot\Transformer\Stock\FromOptimaData;
 use Spot\Transformer\Stock\FromVentaData;
@@ -22,9 +23,18 @@ class StockTransformerServiceProvider extends AbstractServiceProvider
 
     public function register(): void
     {
-        $this->getContainer()->add(FromBadmData::class)->addTag(ToStockDataTransformer::TAG_NAME);
-        $this->getContainer()->add(FromOptimaData::class)->addTag(ToStockDataTransformer::TAG_NAME);
-        $this->getContainer()->add(FromVentaData::class)->addTag(ToStockDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromBadmData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToStockDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromOptimaData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToStockDataTransformer::TAG_NAME);
+        $this->getContainer()
+            ->add(FromVentaData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(ToStockDataTransformer::TAG_NAME);
         $this->getContainer()->add(StockTransformer::class)->addArgument(
             $this->getContainer()->get(ToStockDataTransformer::TAG_NAME)
         );

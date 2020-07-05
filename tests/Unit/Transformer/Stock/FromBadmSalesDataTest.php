@@ -6,6 +6,7 @@ namespace Spot\Tests\Unit\Transformer\Stock;
 
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromBadmData;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class FromBadmSalesDataTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue((new FromBadmData())->supports('badm'));
+        self::assertTrue((new FromBadmData($this->createMock(DistributorRepository::class)))->supports('badm'));
     }
 
     /**
@@ -25,7 +26,7 @@ class FromBadmSalesDataTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromBadmData())->transform([1, 2, 3]);
+        (new FromBadmData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -42,7 +43,7 @@ class FromBadmSalesDataTest extends TestCase
 
         $this->assertInstanceOf(
             StockRecord::class,
-            (new FromBadmData())->transformAll(new \ArrayIterator([$record]))->current()
+            (new FromBadmData($this->createMock(DistributorRepository::class)))->transformAll(new \ArrayIterator([$record]))->current()
         );
     }
 }

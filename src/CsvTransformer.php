@@ -17,6 +17,8 @@ use Spot\Container\ServiceProvider\StockTransformerServiceProvider;
 use Spot\Container\ServiceProvider\TtoptionsTransformerServiceProvider;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
+use Spot\Repository\DistributorRepository;
+use Spot\Repository\JsonDistributorRepository;
 use Spot\Transformer\Delivery\DeliveryTransformer;
 use Spot\Transformer\Sku\SkuTransformer;
 use Spot\Transformer\Stock\StockTransformer;
@@ -104,7 +106,7 @@ class CsvTransformer
     public static function create(string $targetDirectory, ?AdapterInterface $adapter = null): self
     {
         $container = new Container();
-        $container->delegate(new ReflectionContainer());
+        $container->delegate((new ReflectionContainer())->cacheResolutions());
 
         $container->addServiceProvider(FileMetaDataServiceProvider::class);
         $container->addServiceProvider(DeliveryTransformerServiceProvider::class);
@@ -120,6 +122,11 @@ class CsvTransformer
         $container->add(Sku::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
         $container->add(Stock::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
         $container->add(Reader::class)->addArgument(FileMetaData::class);
+
+        $container->add(
+            DistributorRepository::class,
+            new JsonDistributorRepository(file_get_contents(__DIR__ . '/../distributorMap.json'))
+        );
 
         return new self(
             $container->get(Reader::class),
