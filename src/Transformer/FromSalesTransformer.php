@@ -2,18 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer;
 
-use Spot\Exception\SpotException;
-use Spot\Transformer\BaseTransformer;
+use Spot\FileMetaData\FileMetaDataStrategy;
 
-class DeliveryTransformer extends BaseTransformer
+abstract class FromSalesTransformer extends FromPartnerData implements TransformerStrategy
 {
-    /**
-     * @throws SpotException
-     */
-    public function getFor(string $partnerType): ToDeliveryDataTransformer
+    public function supports(string $partnerType, string $reportType): bool
     {
-        return parent::getFor($partnerType);
+        return $this->getPartnerType() === $partnerType && FileMetaDataStrategy::REPORT_TYPE_SALES === $reportType;
     }
 }

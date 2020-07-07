@@ -6,5 +6,6 @@ namespace Spot\Transformer;
 
 interface TransformerStrategy
 {
-    public function supports(string $partnerType): bool;
+    public const TAG_NAME = 'transformer.strategy';
+    public function supports(string $partnerType, string $reportType): bool;
 }

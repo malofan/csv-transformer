@@ -2,46 +2,39 @@
 
 declare(strict_types=1);
 
-namespace Spot\Tests\Unit\Transformer\Delivery;
+namespace Spot\Tests\Unit\Transformer;
 
-use Spot\DTO\DeliveryRecord;
-use Spot\Exception\SpotException;
-use Spot\Transformer\FromSalesTransformer;
+use Iterator;
 use PHPUnit\Framework\TestCase;
-use Spot\Transformer\Delivery\ToDeliveryDataTransformer;
+use Spot\Transformer\Transformer;
+use Spot\Transformer\TransformerProvider;
 use Spot\Transformer\TransformerStrategy;
 
-class DeliveryTransformerTest extends TestCase
+class TransformerProviderTest extends TestCase
 {
     public function test(): void
     {
-        $transformer = new class implements TransformerStrategy, ToDeliveryDataTransformer {
-            /**
-             * @param mixed[] $record
-             */
-            public function transform(array $record): DeliveryRecord
-            {
-                // TODO: Implement transform() method.
-            }
+        $transformer = new class implements TransformerStrategy, Transformer {
 
-            public function supports(string $partnerType): bool
+            public function supports(string $partnerType, string $reportType): bool
             {
                 return true;
             }
+
+            public function transformAll(Iterator $records): iterable // phpcs:ignore
+            {
+            }
+
+            public function transform(array $record) // phpcs:ignore
+            {
+            }
+
+            public function getType(): string
+            {
+            }
         };
-        $provider = new FromSalesTransformer([$transformer]);
+        $provider = new TransformerProvider([$transformer]);
 
-        self::assertInstanceOf(ToDeliveryDataTransformer::class, $provider->getFor('test'));
-    }
-
-    /**
-     * @test
-     */
-    public function exceptionThrown(): void
-    {
-        $provider = new \Spot\Transformer\FromSalesTransformer([]);
-
-        $this->expectException(SpotException::class);
-        $provider->getFor('test');
+        self::assertInstanceOf(Transformer::class, $provider->getFor('test', 'test')->current());
     }
 }

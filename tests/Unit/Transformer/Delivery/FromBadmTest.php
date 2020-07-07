@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Delivery\FromBadmData;
 use PHPUnit\Framework\TestCase;
 
-class FromBadmSalesDataTest extends TestCase
+class FromBadmTest extends TestCase
 {
     /**
      * @test
@@ -35,10 +35,7 @@ class FromBadmSalesDataTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'badm',
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('badm', (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -46,9 +43,6 @@ class FromBadmSalesDataTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame(
-            'delivery',
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->getType()
-        );
+        self::assertSame('delivery', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

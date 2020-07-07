@@ -9,10 +9,8 @@ use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToDeliveryDataTransformer
+class FromOptimaData extends ToDeliveryTransformer
 {
     /**
      * @return string[]
@@ -59,8 +57,8 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToD
         return parent::transform($record);
     }
 
-    public function supports(string $partnerType): bool
+    public function getPartnerType(): string
     {
-        return PartnerTypes::OPTIMA === $partnerType;
+        return PartnerTypes::OPTIMA;
     }
 }

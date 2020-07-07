@@ -8,10 +8,8 @@ use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSkuDataTransformer
+class FromVentaData extends ToSkuTransformer
 {
     /**
      * @return string[]
@@ -49,8 +47,8 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSk
         return parent::transform($record);
     }
 
-    public function supports(string $partnerType): bool
+    public function getPartnerType(): string
     {
-        return PartnerTypes::VENTA === $partnerType;
+        return PartnerTypes::VENTA;
     }
 }

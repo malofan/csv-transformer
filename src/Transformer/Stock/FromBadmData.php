@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Spot\Transformer\Stock;
 
 use DateTimeImmutable;
-use Iterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromBadmData extends FromPartnerData implements TransformerStrategy, ToStockDataTransformer
+class FromBadmData extends ToStockTransformer
 {
     /**
      * @return string[]
@@ -49,17 +46,6 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToSto
     }
 
     /**
-     * @return StockRecord[]
-     * @throws InvalidRecordException
-     */
-    public function transformAll(Iterator $records): iterable
-    {
-        foreach ($records as $record) {
-            yield $this->transform($record);
-        }
-    }
-
-    /**
      * @param mixed[] $record
      * @throws InvalidRecordException
      */
@@ -68,8 +54,8 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToSto
         return parent::transform($record);
     }
 
-    public function supports(string $partnerType): bool
+    public function getPartnerType(): string
     {
-        return PartnerTypes::BADM === $partnerType;
+        return PartnerTypes::BADM;
     }
 }

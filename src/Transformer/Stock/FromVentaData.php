@@ -10,10 +10,8 @@ use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromVentaData extends FromPartnerData implements TransformerStrategy, ToStockDataTransformer
+class FromVentaData extends ToStockTransformer
 {
     /**
      * @return string[]
@@ -25,6 +23,7 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSt
 
     /**
      * @param mixed[] $record
+     * @return StockRecord[]
      */
     protected function transformRecord(array $record): iterable
     {
@@ -49,15 +48,9 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSt
         }
     }
 
-    public function transformAll(Iterator $records): iterable
-    {
-        foreach ($records as $record) {
-            yield from $this->transform($record);
-        }
-    }
-
     /**
      * @param mixed[] $record
+     * @return StockRecord[]
      * @throws InvalidRecordException
      */
     public function transform(array $record): iterable
@@ -65,8 +58,19 @@ class FromVentaData extends FromPartnerData implements TransformerStrategy, ToSt
         return parent::transform($record);
     }
 
-    public function supports(string $partnerType): bool
+    /**
+     * @return StockRecord[]
+     * @throws InvalidRecordException
+     */
+    public function transformAll(Iterator $records): iterable
     {
-        return PartnerTypes::VENTA === $partnerType;
+        foreach ($records as $record) {
+            yield from $this->transform($record);
+        }
+    }
+
+    public function getPartnerType(): string
+    {
+        return PartnerTypes::VENTA;
     }
 }

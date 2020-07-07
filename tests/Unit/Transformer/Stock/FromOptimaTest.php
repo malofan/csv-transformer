@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Spot\Tests\Unit\Transformer\Stock;
 
+use ArrayIterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromOptimaData;
 use PHPUnit\Framework\TestCase;
 
-class FromOptimaSalesDataTest extends TestCase
+class FromOptimaTest extends TestCase
 {
     /**
      * @test
@@ -47,7 +48,7 @@ class FromOptimaSalesDataTest extends TestCase
         $repo->method('getIdBy')->willReturn(10);
 
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new FromOptimaData($repo))->transformAll(new \ArrayIterator($records))->current();
+        $stockRecord = (new FromOptimaData($repo))->transformAll(new ArrayIterator($records))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
         $this->assertSame(10, $stockRecord->distributorId);
@@ -70,9 +71,6 @@ class FromOptimaSalesDataTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame(
-            'stock',
-            (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType()
-        );
+        self::assertSame('stock', (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Spot\Transformer;
 
+use Iterator;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
 
-abstract class FromPartnerData
+abstract class FromPartnerData implements Transformer
 {
     protected $distributorRepository;
 
@@ -25,6 +26,15 @@ abstract class FromPartnerData
      * @param mixed[] $record
      */
     abstract protected function transformRecord(array $record); //phpcs:ignore
+
+    abstract public function getPartnerType(): string;
+
+    public function transformAll(Iterator $records): iterable //phpcs:ignore
+    {
+        foreach ($records as $record) {
+            yield $this->transform($record);
+        }
+    }
 
     /**
      * @param mixed[] $record

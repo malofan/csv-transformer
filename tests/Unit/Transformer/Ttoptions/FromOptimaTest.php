@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Ttoptions\FromOptimaData;
 use PHPUnit\Framework\TestCase;
 
-class FromOptimaSalesDataTest extends TestCase
+class FromOptimaTest extends TestCase
 {
     /**
      * @test
@@ -28,5 +28,24 @@ class FromOptimaSalesDataTest extends TestCase
     {
         $this->expectException(InvalidRecordException::class);
         (new FromOptimaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+    }
+
+    /**
+     * @test
+     */
+    public function getPartnerType(): void
+    {
+        self::assertSame(
+            'optima',
+            (new FromOptimaData($this->createMock(DistributorRepository::class)))->getPartnerType()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getType(): void
+    {
+        self::assertSame('ttoptions', (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Sku\FromVentaData;
 use PHPUnit\Framework\TestCase;
 
-class FromVentaSalesDataTest extends TestCase
+class FromVentaTest extends TestCase
 {
     /**
      * @test
@@ -46,9 +46,6 @@ class FromVentaSalesDataTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame(
-            'sku',
-            (new FromVentaData($this->createMock(DistributorRepository::class)))->getType()
-        );
+        self::assertSame('sku', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

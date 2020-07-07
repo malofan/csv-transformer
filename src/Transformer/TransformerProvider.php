@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Spot\Transformer;
 
-use Spot\Exception\SpotException;
-
-abstract class BaseTransformer
+class TransformerProvider
 {
     private $transformers;
 
@@ -18,19 +16,16 @@ abstract class BaseTransformer
         $this->transformers = $transformers;
     }
 
-    public function getFor(string $partnerType) // phpcs:ignore
+    /**
+     * @return Transformer[]
+     */
+    public function getFor(string $partnerType, string $reportType): iterable
     {
         foreach ($this->transformers as $transformer) {
-            if ($transformer->supports($partnerType)) {
+            if ($transformer->supports($partnerType, $reportType)) {
 
-                return $transformer;
+                yield $transformer;
             }
         }
-
-        $classParts = explode('\\', static::class);
-
-        throw new SpotException(
-            sprintf('%s for partner type "%s" doesn\'t exists', array_pop($classParts), $partnerType)
-        );
     }
 }

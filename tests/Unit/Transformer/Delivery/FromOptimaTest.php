@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Delivery\FromOptimaData;
 use PHPUnit\Framework\TestCase;
 
-class FromOptimaSalesDataTest extends TestCase
+class FromOptimaTest extends TestCase
 {
     /**
      * @test
@@ -46,9 +46,6 @@ class FromOptimaSalesDataTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame(
-            'delivery',
-            (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType()
-        );
+        self::assertSame('delivery', (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Spot\Tests\Unit\Transformer\Stock;
 
+use ArrayIterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromVentaData;
 use PHPUnit\Framework\TestCase;
 
-class FromVentaSalesDataTest extends TestCase
+class FromVentaTest extends TestCase
 {
     /**
      * @test
@@ -46,10 +47,29 @@ class FromVentaSalesDataTest extends TestCase
         $repo = $this->createMock(DistributorRepository::class);
         $repo->method('getIdBy')->willReturn(10);
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new FromVentaData($repo))->transformAll(new \ArrayIterator([$record]))->current();
+        $stockRecord = (new FromVentaData($repo))->transformAll(new ArrayIterator([$record]))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
         $this->assertSame(10, $stockRecord->distributorId);
         $this->assertSame(123, $stockRecord->qty);
+    }
+
+    /**
+     * @test
+     */
+    public function getPartnerType(): void
+    {
+        self::assertSame(
+            'venta',
+            (new FromVentaData($this->createMock(DistributorRepository::class)))->getPartnerType()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getType(): void
+    {
+        self::assertSame('stock', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

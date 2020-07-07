@@ -10,10 +10,8 @@ use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToStockDataTransformer
+class FromOptimaData extends ToStockTransformer
 {
     /**
      * @return string[]
@@ -57,6 +55,10 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToS
         }
     }
 
+    /**
+     * @return StockRecord[]
+     * @throws InvalidRecordException
+     */
     public function transformAll(Iterator $records): iterable
     {
         $records->rewind();
@@ -74,6 +76,7 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToS
     /**
      * @param string[] $record
      * @param string[] $header
+     * @return StockRecord[]
      * @throws InvalidRecordException
      */
     public function transform(array $record, array $header = []): iterable
@@ -81,8 +84,8 @@ class FromOptimaData extends FromPartnerData implements TransformerStrategy, ToS
         yield from $this->transformRecord($record, $header);
     }
 
-    public function supports(string $partnerType): bool
+    public function getPartnerType(): string
     {
-        return PartnerTypes::OPTIMA === $partnerType;
+        return PartnerTypes::OPTIMA;
     }
 }

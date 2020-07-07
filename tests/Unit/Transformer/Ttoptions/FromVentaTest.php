@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Ttoptions\FromVentaData;
 use PHPUnit\Framework\TestCase;
 
-class FromVentaSalesDataTest extends TestCase
+class FromVentaTest extends TestCase
 {
     /**
      * @test
@@ -28,5 +28,24 @@ class FromVentaSalesDataTest extends TestCase
     {
         $this->expectException(InvalidRecordException::class);
         (new FromVentaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+    }
+
+    /**
+     * @test
+     */
+    public function getPartnerType(): void
+    {
+        self::assertSame(
+            'venta',
+            (new FromVentaData($this->createMock(DistributorRepository::class)))->getPartnerType()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getType(): void
+    {
+        self::assertSame('ttoptions', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -9,7 +9,7 @@ use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Ttoptions\FromBadmData;
 use PHPUnit\Framework\TestCase;
 
-class FromBadmSalesDataTest extends TestCase
+class FromBadmTest extends TestCase
 {
     /**
      * @test
@@ -28,5 +28,21 @@ class FromBadmSalesDataTest extends TestCase
     {
         $this->expectException(InvalidRecordException::class);
         (new FromBadmData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+    }
+
+    /**
+     * @test
+     */
+    public function getPartnerType(): void
+    {
+        self::assertSame('badm', (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType());
+    }
+
+    /**
+     * @test
+     */
+    public function getType(): void
+    {
+        self::assertSame('ttoptions', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

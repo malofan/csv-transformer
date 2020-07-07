@@ -8,10 +8,8 @@ use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
-use Spot\Transformer\FromPartnerData;
-use Spot\Transformer\TransformerStrategy;
 
-class FromBadmData extends FromPartnerData implements TransformerStrategy, ToTtoptionsDataTransformer
+class FromBadmData extends ToTtoptionsTransformer
 {
     /**
      * @return string[]
@@ -54,8 +52,8 @@ class FromBadmData extends FromPartnerData implements TransformerStrategy, ToTto
         return parent::transform($record);
     }
 
-    public function supports(string $partnerType): bool
+    public function getPartnerType(): string
     {
-        return PartnerTypes::BADM === $partnerType;
+        return PartnerTypes::BADM;
     }
 }

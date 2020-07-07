@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Spot\Tests\Unit\Transformer\Stock;
 
+use ArrayIterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
 use Spot\Transformer\Stock\FromBadmData;
 use PHPUnit\Framework\TestCase;
 
-class FromBadmSalesDataTest extends TestCase
+class FromBadmTest extends TestCase
 {
     /**
      * @test
@@ -46,7 +47,7 @@ class FromBadmSalesDataTest extends TestCase
         $this->assertInstanceOf(
             StockRecord::class,
             (new FromBadmData($this->createMock(DistributorRepository::class)))->transformAll(
-                new \ArrayIterator([$record])
+                new ArrayIterator([$record])
             )->current()
         );
     }
@@ -56,10 +57,7 @@ class FromBadmSalesDataTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'badm',
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('badm', (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -67,9 +65,6 @@ class FromBadmSalesDataTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame(
-            'stock',
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->getType()
-        );
+        self::assertSame('stock', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
     }
 }
