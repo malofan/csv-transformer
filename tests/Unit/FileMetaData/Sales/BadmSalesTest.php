@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spot\Tests\Unit\FileMetaData;
+namespace Spot\Tests\Unit\FileMetaData\Sales;
 
 use PHPUnit\Framework\TestCase;
 use Spot\FileMetaData\Sales\BadmSales;

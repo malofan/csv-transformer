@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spot\FileMetaData;
+namespace Spot\FileMetaData\Sales;
 
 use Spot\PartnerTypes;
 
-final class OptimaSalesFileMetaData extends BaseFileMetaData implements FileMetaDataStrategy
+final class OptimaSales extends SalesFileMetaData
 {
     /**
      * @return string[]
@@ -30,8 +30,8 @@ final class OptimaSalesFileMetaData extends BaseFileMetaData implements FileMeta
         ];
     }
 
-    public function supports(string $partnerType, string $reportType = null): bool
+    public function partner(): string
     {
-        return PartnerTypes::OPTIMA === $partnerType && FileMetaDataStrategy::REPORT_TYPE_SALES === $reportType;
+        return PartnerTypes::OPTIMA;
     }
 }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spot\FileMetaData;
+namespace Spot\FileMetaData\Sales;
 
 use Spot\PartnerTypes;
 
-final class BadmFileMetaData extends BaseFileMetaData implements FileMetaDataStrategy
+final class BadmSales extends SalesFileMetaData
 {
     /**
      * @return string[]
@@ -38,8 +38,8 @@ final class BadmFileMetaData extends BaseFileMetaData implements FileMetaDataStr
         ];
     }
 
-    public function supports(string $partnerType, string $reportType = null): bool
+    public function partner(): string
     {
-        return PartnerTypes::BADM === $partnerType;
+        return PartnerTypes::BADM;
     }
 }

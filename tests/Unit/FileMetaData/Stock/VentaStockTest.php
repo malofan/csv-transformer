@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Spot\Tests\Unit\FileMetaData\Stock;
 
 use PHPUnit\Framework\TestCase;
-use Spot\FileMetaData\Stock\OptimaStock;
+use Spot\FileMetaData\Stock\VentaStock;
 
-class OptimaStockTest extends TestCase
+class VentaStockTest extends TestCase
 {
     /**
      * @test
      */
     public function supports(): void
     {
-        self::assertTrue((new OptimaStock())->supports('optima', 'stock'));
+        self::assertTrue((new VentaStock())->supports('venta', 'stock'));
     }
 }

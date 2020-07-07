@@ -8,6 +8,8 @@ use Spot\Exception\SpotException;
 
 class FileMetaData
 {
+    public const TAG_NAME = 'file.meta.data.strategy';
+
     private $fileMetaDataSet;
 
     /**

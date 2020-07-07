@@ -6,23 +6,18 @@ namespace Spot\FileMetaData\Stock;
 
 use Spot\PartnerTypes;
 
-final class OptimaStock extends StockFileMetaData
+final class VentaStock extends StockFileMetaData
 {
     /**
      * @return string[]
      */
     public function headerFields(): array
     {
-        return ['Товар', 'Код товара', 'Все'];
-    }
-
-    public function headerOffset(): ?int
-    {
-        return null;
+        return ['Наименование Препарата', 'Код Мориона', 'Общий остаток'];
     }
 
     public function partner(): string
     {
-        return PartnerTypes::OPTIMA;
+        return PartnerTypes::VENTA;
     }
 }
