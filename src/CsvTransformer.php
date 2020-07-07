@@ -10,118 +10,99 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
-use Spot\Container\ServiceProvider\DeliveryTransformerServiceProvider;
+use Spot\Container\ServiceProvider\TransformerServiceProvider;
 use Spot\Container\ServiceProvider\FileMetaDataServiceProvider;
-use Spot\Container\ServiceProvider\SkuTransformerServiceProvider;
-use Spot\Container\ServiceProvider\StockTransformerServiceProvider;
-use Spot\Container\ServiceProvider\TtoptionsTransformerServiceProvider;
+use Spot\DTO\TransformedData;
 use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataStrategy;
+use Spot\Guesser\Guesser;
 use Spot\Repository\DistributorRepository;
 use Spot\Repository\JsonDistributorRepository;
-use Spot\Transformer\Delivery\DeliveryTransformer;
-use Spot\Transformer\Sku\SkuTransformer;
-use Spot\Transformer\Stock\StockTransformer;
-use Spot\Transformer\Ttoptions\TtoptionsTransformer;
-use Spot\Writer\Delivery;
-use Spot\Writer\Sku;
-use Spot\Writer\Stock;
-use Spot\Writer\Ttoptions;
+use Spot\Transformer\TransformerProvider;
+use Spot\Writer\WriterFactory;
 
 class CsvTransformer
 {
     private $reader;
     private $fileMetaData;
-    private $deliveryTransformerProvider;
-    private $ttoptionsTransformerProvider;
-    private $skuTransformerProvider;
+    private $transformers;
     private $stockTransformer;
-    private $deliveryWriter;
-    private $ttoptionsWriter;
-    private $skuWriter;
-    private $stockWriter;
+    private $writerFactory;
+    private $guesser;
 
     public function __construct(
         Reader $reader,
         FileMetaData $fileMetaData,
-        DeliveryTransformer $deliveryTransformer,
-        TtoptionsTransformer $ttoptionsTransformer,
-        SkuTransformer $skuTransformer,
-        StockTransformer $stockTransformer,
-        Delivery $deliveryWriter,
-        Ttoptions $ttoptionsWriter,
-        Sku $skuWriter,
-        Stock $stockWriter
+        TransformerProvider $transformerProvider,
+        WriterFactory $writerFactory,
+        Guesser $guesser
     ) {
         $this->reader = $reader;
         $this->fileMetaData = $fileMetaData;
-        $this->deliveryTransformerProvider = $deliveryTransformer;
-        $this->ttoptionsTransformerProvider = $ttoptionsTransformer;
-        $this->skuTransformerProvider = $skuTransformer;
-        $this->stockTransformer = $stockTransformer;
-        $this->deliveryWriter = $deliveryWriter;
-        $this->ttoptionsWriter = $ttoptionsWriter;
-        $this->skuWriter = $skuWriter;
-        $this->stockWriter = $stockWriter;
+        $this->transformers = $transformerProvider;
+        $this->writerFactory = $writerFactory;
+        $this->guesser = $guesser;
     }
 
     /**
-     *  $@param resource $stream
+     * @param resource $stream phpcs:ignore
+     * @return TransformedData[]
      */
-    public function transformSalesData($stream, string $partnerType): void // phpcs:ignore
+    public function transform($stream): iterable // phpcs:ignore
+    {
+        $data = $this->guesser->guessBy($stream);
+
+        foreach ($this->transformers->getFor($data->partnerType, $data->reportType) as $transformer) {
+            $writer = $this->writerFactory->getFor($transformer->getType());
+            $writer->insertRecords($transformer->transformAll($data->records));
+
+            yield $writer->getData($data->partnerType, $transformer->getType());
+        }
+    }
+
+    /**
+     * @param resource $stream phpcs:ignore
+     * @return TransformedData[]
+     */
+    public function transformSalesData($stream, string $partnerType): iterable // phpcs:ignore
     {
         $fileMetaData = $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES);
-        $deliveryTransformer = $this->deliveryTransformerProvider->getFor($partnerType);
-        $ttoptionsTransformer = $this->ttoptionsTransformerProvider->getFor($partnerType);
-        $skuTransformer = $this->skuTransformerProvider->getFor($partnerType);
+        $records = $this->reader->read($stream, $fileMetaData)->getRecords();
 
-        foreach ($this->reader->read($stream, $fileMetaData) as $record) {
-            $this->deliveryWriter->insertRecord($deliveryTransformer->transform($record));
-            $this->ttoptionsWriter->insertRecord($ttoptionsTransformer->transform($record));
-            $this->skuWriter->insertRecord($skuTransformer->transform($record));
+        foreach ($this->transformers->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES) as $transformer) {
+            $writer = $this->writerFactory->getFor($transformer->getType());
+            $writer->insertRecords($transformer->transformAll($records));
+
+            yield $writer->getData($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES);
         }
-
-        $this->deliveryWriter->save($partnerType . '_' . Delivery::FILE_NAME);
-        $this->ttoptionsWriter->save($partnerType . '_' . Ttoptions::FILE_NAME);
-        $this->skuWriter->save($partnerType . '_' . Sku::FILE_NAME);
     }
 
     /**
-     *  $@param resource $stream
+     *  $@param resource $stream phpcs:ignore
      */
-    public function transformStockData($stream, string $partnerType): void // phpcs:ignore
+    public function transformStockData($stream, string $partnerType): TransformedData // phpcs:ignore
     {
-        $this->stockWriter->insertRecords(
+        $writer = $this->writerFactory->getFor(FileMetaDataStrategy::REPORT_TYPE_STOCK);
+        $fileMetaData = $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_STOCK);
+
+        $writer->insertRecords(
             $this->stockTransformer->getFor($partnerType)->transformAll(
-                $this->reader->read(
-                    $stream,
-                    $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_STOCK)
-                )
+                $this->reader->read($stream, $fileMetaData)->getRecords()
             )
         );
 
-        $this->stockWriter->save($partnerType . '_' . Stock::FILE_NAME);
+        return $writer->getData($partnerType, FileMetaDataStrategy::REPORT_TYPE_STOCK);
     }
 
-    public static function create(string $targetDirectory, ?AdapterInterface $adapter = null): self
+    public static function create(?AdapterInterface $adapter = null): self
     {
         $container = new Container();
         $container->delegate((new ReflectionContainer())->cacheResolutions());
 
         $container->addServiceProvider(FileMetaDataServiceProvider::class);
-        $container->addServiceProvider(DeliveryTransformerServiceProvider::class);
-        $container->addServiceProvider(TtoptionsTransformerServiceProvider::class);
-        $container->addServiceProvider(SkuTransformerServiceProvider::class);
-        $container->addServiceProvider(StockTransformerServiceProvider::class);
+        $container->addServiceProvider(TransformerServiceProvider::class);
 
         $container->add(FilesystemInterface::class, self::getFilesystem($adapter));
-        $container->add(Delivery::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
-        $container->add(Ttoptions::class)->addArguments(
-            [$container->get(FilesystemInterface::class), $targetDirectory]
-        );
-        $container->add(Sku::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
-        $container->add(Stock::class)->addArguments([$container->get(FilesystemInterface::class), $targetDirectory]);
-        $container->add(Reader::class)->addArgument(FileMetaData::class);
 
         $container->add(
             DistributorRepository::class,
@@ -131,14 +112,9 @@ class CsvTransformer
         return new self(
             $container->get(Reader::class),
             $container->get(FileMetaData::class),
-            $container->get(DeliveryTransformer::class),
-            $container->get(TtoptionsTransformer::class),
-            $container->get(SkuTransformer::class),
-            $container->get(StockTransformer::class),
-            $container->get(Delivery::class),
-            $container->get(Ttoptions::class),
-            $container->get(Sku::class),
-            $container->get(Stock::class)
+            $container->get(TransformerProvider::class),
+            $container->get(WriterFactory::class),
+            $container->get(Guesser::class)
         );
     }
 

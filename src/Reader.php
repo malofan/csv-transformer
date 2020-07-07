@@ -6,37 +6,44 @@ namespace Spot;
 
 use Iterator;
 use League\Csv\Reader as LeagueReader;
-use Spot\FileMetaData\FileMetaData;
 use Spot\FileMetaData\FileMetaDataInterface;
 
 class Reader
 {
-    private $fileMetaData;
-
-    public function __construct(FileMetaData $fileMetaData)
-    {
-        $this->fileMetaData = $fileMetaData;
-    }
+    private $reader;
 
     /**
-     * @param resource $stream
+     * @param resource $stream phpcs:ignore
      * @throws Exception\SpotException
      * @throws \League\Csv\Exception
      */
-    public function read($stream, FileMetaDataInterface $fileMetaData): Iterator
+    public function read($stream, FileMetaDataInterface $fileMetaData): self //phpcs:ignore
     {
-        $reader = LeagueReader::createFromStream($stream);
-        $reader->setDelimiter($fileMetaData->delimiter());
-        $reader->setHeaderOffset($fileMetaData->headerOffset());
-        $this->checkForStreamFilter($reader);
+        $this->reader = LeagueReader::createFromStream($stream);
+        $this->reader->setDelimiter($fileMetaData->delimiter());
+        $this->reader->setHeaderOffset($fileMetaData->headerOffset());
+        $this->checkForStreamFilter();
 
-        return $reader->getRecords();
+        return $this;
+    }
+
+    public function getRecords(): Iterator
+    {
+        return $this->reader->getRecords();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getHeader(): array
+    {
+        return $this->reader->getHeader() ?: $this->reader->fetchOne();
     }
 
     /**
      * @throws \League\Csv\Exception
      */
-    private function checkForStreamFilter(LeagueReader $reader): void
+    private function checkForStreamFilter(): void
     {
         // This is ugly solution for windows-1251 encoded files found in stock
         $encodingList = [
@@ -46,11 +53,10 @@ class Reader
             'Windows-1252',
             'Windows-1254',
         ];
-        $header = $reader->getHeader() ?: $reader->fetchOne();
-        $encoding = mb_detect_encoding($header[0], $encodingList);
+        $encoding = mb_detect_encoding($this->getHeader()[0], $encodingList);
 
         if ($encoding !== 'UTF-8') {
-            $reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $encoding));
+            $this->reader->addStreamFilter(sprintf('convert.iconv.%s/UTF-8', $encoding));
         }
     }
 }
