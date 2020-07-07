@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\DeliveryRecord;
+use Spot\Transformer\Delivery\ToDeliveryTransformer;
 
-class Delivery extends Writer
+class Delivery extends BaseWriter
 {
-    public const FILE_NAME = 'delivery.csv';
-
     /**
      * @return string[]
      */
@@ -42,5 +41,10 @@ class Delivery extends Writer
                 $record->billNumber
             ]
         );
+    }
+
+    public static function supports(string $reportType): bool
+    {
+        return ToDeliveryTransformer::TYPE === $reportType;
     }
 }

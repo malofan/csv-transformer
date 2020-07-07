@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\SkuRecord;
+use Spot\Transformer\Sku\ToSkuTransformer;
 
-class Sku extends Writer
+class Sku extends BaseWriter
 {
-    public const FILE_NAME = 'sku.csv';
-
     /**
      * @return string[]
      */
@@ -40,5 +39,10 @@ class Sku extends Writer
                 $record->units,
             ]
         );
+    }
+
+    public static function supports(string $reportType): bool
+    {
+        return ToSkuTransformer::TYPE === $reportType;
     }
 }

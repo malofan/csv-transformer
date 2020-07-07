@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\StockRecord;
+use Spot\Transformer\Stock\ToStockTransformer;
 
-class Stock extends Writer
+class Stock extends BaseWriter
 {
-    public const FILE_NAME = 'stocks.csv';
-
     /**
      * @return string[]
      */
@@ -24,16 +23,6 @@ class Stock extends Writer
             'Годен до',
             'Дата производства',
         ];
-    }
-
-    /**
-     * @param StockRecord[] $records
-     */
-    public function insertRecords(iterable $records): void
-    {
-        foreach ($records as $record) {
-            $this->insertRecord($record);
-        }
     }
 
     /**
@@ -52,5 +41,10 @@ class Stock extends Writer
                 ($record->manufactureDate ? $record->manufactureDate->format('Y.m.d') : null),
             ]
         );
+    }
+
+    public static function supports(string $reportType): bool
+    {
+        return ToStockTransformer::TYPE === $reportType;
     }
 }

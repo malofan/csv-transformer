@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\TtoptionsRecord;
+use Spot\Transformer\Ttoptions\ToTtoptionsTransformer;
 
-class Ttoptions extends Writer
+class Ttoptions extends BaseWriter
 {
-    public const FILE_NAME = 'ttoptiopns.csv';
-
     /**
      * @return string[]
      */
@@ -38,5 +37,10 @@ class Ttoptions extends Writer
                 $record->okpo
             ]
         );
+    }
+
+    public static function supports(string $reportType): bool
+    {
+        return ToTtoptionsTransformer::TYPE === $reportType;
     }
 }
