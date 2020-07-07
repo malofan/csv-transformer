@@ -22,11 +22,7 @@ class JsonDistributorRepository implements DistributorRepository
     {
         if (!isset($this->storage[$partnerType][$reportType])) {
             throw new SpotException(
-                sprintf(
-                    'Distributor list for "%s" report was not found for partner "%s"',
-                    $reportType,
-                    $partnerType
-                )
+                sprintf('Distributor list for "%s" report was not found for partner "%s"', $reportType, $partnerType)
             );
         }
 
