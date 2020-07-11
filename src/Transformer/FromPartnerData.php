@@ -32,8 +32,23 @@ abstract class FromPartnerData implements Transformer
     public function transformAll(Iterator $records): iterable //phpcs:ignore
     {
         foreach ($records as $record) {
+            if ($this->isEmptyRow($record)) {
+                continue;
+            }
+
             yield $this->transform($record);
         }
+    }
+
+    /**
+     * There may be row with only START_OF_FILE char or white space
+     * @param mixed[] $record
+     */
+    public function isEmptyRow(array $record): bool
+    {
+        $uniq = array_unique(array_values($record));
+
+        return count($uniq) === 2 && trim($uniq[0], " \t\n\r\0\x0C\0\x0B") === '' && $uniq[1] === null;
     }
 
     /**

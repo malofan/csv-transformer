@@ -18,7 +18,7 @@ class FromVentaData extends ToStockTransformer
      */
     protected function getRequiredRecordFields(): array
     {
-        return ['Наименование Препарата', 'Код Мориона',];
+        return ['Наименование Препарата',];
     }
 
     /**
@@ -65,6 +65,10 @@ class FromVentaData extends ToStockTransformer
     public function transformAll(Iterator $records): iterable
     {
         foreach ($records as $record) {
+            if ($this->isEmptyRow($record)) {
+                continue;
+            }
+
             yield from $this->transform($record);
         }
     }

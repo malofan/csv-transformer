@@ -67,6 +67,10 @@ class FromOptimaData extends ToStockTransformer
         $records->next(); // First record consist of meta data, so we skip it
 
         while ($records->valid()) {
+            if ($this->isEmptyRow($records->current())) {
+                continue;
+            }
+
             yield from $this->transform($records->current(), $header);
 
             $records->next();
