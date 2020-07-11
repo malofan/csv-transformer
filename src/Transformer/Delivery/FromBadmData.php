@@ -41,7 +41,7 @@ class FromBadmData extends ToDeliveryTransformer
             DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накл']) ?: null,
             $record['Код товара'],
             (float)$record['Количество'],
-            null,
+            0,
             null
         );
     }
