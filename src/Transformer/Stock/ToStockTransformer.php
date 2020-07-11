@@ -8,7 +8,7 @@ use Spot\Transformer\FromStockTransformer;
 
 abstract class ToStockTransformer extends FromStockTransformer
 {
-    public const TYPE = 'stock';
+    public const TYPE = 'stocks';
 
     public function getType(): string
     {

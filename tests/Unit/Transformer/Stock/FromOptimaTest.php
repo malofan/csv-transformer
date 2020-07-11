@@ -71,6 +71,6 @@ class FromOptimaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stock', (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new FromOptimaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -65,6 +65,6 @@ class FromBadmTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stock', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
     }
 }

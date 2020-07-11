@@ -70,6 +70,6 @@ class FromVentaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stock', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
     }
 }
