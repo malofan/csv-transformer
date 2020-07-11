@@ -19,6 +19,8 @@ class Ttoptions extends BaseWriter
             'Код клиента ERP',
             'Название клиента',
             'Адрес клиента',
+            'Название ТТ',
+            'Адрес ТТ',
             'ОКПО'
         ];
     }
@@ -32,6 +34,8 @@ class Ttoptions extends BaseWriter
             [
                 $record->distributorId,
                 $record->clientERPCode,
+                $record->clientName,
+                $record->clientAddress,
                 $record->clientName,
                 $record->clientAddress,
                 $record->okpo

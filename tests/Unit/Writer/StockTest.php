@@ -14,6 +14,6 @@ class StockTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(Stock::supports('stock'));
+        self::assertTrue(Stock::supports('stocks'));
     }
 }
