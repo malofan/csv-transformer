@@ -10,6 +10,7 @@ use League\Flysystem\Plugin\ListFiles;
 use Spot\CsvTransformer;
 use Spot\Exception\SpotException;
 use Spot\Transformer\Sku\ToSkuTransformer;
+use Spot\Transformer\Ttoptions\ToTtoptionsTransformer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +20,7 @@ class TransformCommand extends Command
 {
     protected static $defaultName = 'spot:transform';
 
-    private $skuLineHashes = [];
+    private $lineHashes = [];
 
     protected function configure(): void
     {
@@ -83,7 +84,7 @@ class TransformCommand extends Command
      */
     private function copyStreamToStream($source, $target, string $reportType): void // phpcs:ignore
     {
-        if (ToSkuTransformer::TYPE !== $reportType) {
+        if (!in_array($reportType, [ToSkuTransformer::TYPE, ToTtoptionsTransformer::TYPE], true)) {
             stream_copy_to_stream($source, $target);
 
             return;
@@ -93,11 +94,11 @@ class TransformCommand extends Command
             $line = fgets($source);
             $hash = sha1($line); // phpcs:ignore
 
-            if (isset($this->skuLineHashes[$hash])) {
+            if (isset($this->lineHashes[$hash])) {
                 continue;
             }
 
-            $this->skuLineHashes[$hash] = true;
+            $this->lineHashes[$hash] = true;
             fwrite($target, $line);
         }
     }
