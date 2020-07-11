@@ -9,6 +9,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Plugin\ListFiles;
 use Spot\CsvTransformer;
 use Spot\Exception\SpotException;
+use Spot\Transformer\Sku\ToSkuTransformer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TransformCommand extends Command
 {
     protected static $defaultName = 'spot:transform';
+
+    private $skuLineHashes = [];
 
     protected function configure(): void
     {
@@ -49,11 +52,11 @@ class TransformCommand extends Command
             $stream = $filesystem->readStream($file['path']);
 
             foreach ($transformer->transform($stream) as $data) {
-                if (isset($exportData[$data->partnerType][$data->reportType])) {
-                    $exportStream = $exportData[$data->partnerType][$data->reportType];
+                if (isset($exportData[$data->reportType])) {
+                    $exportStream = $exportData[$data->reportType];
                 } else {
                     $exportStream = fopen('php://temp', 'r+ab');
-                    $exportData[$data->partnerType][$data->reportType] = $exportStream;
+                    $exportData[$data->reportType] = $exportStream;
                 }
 
                 rewind($data->stream);
@@ -62,18 +65,41 @@ class TransformCommand extends Command
                     fgetcsv($data->stream);
                 }
 
-                stream_copy_to_stream($data->stream, $exportStream);
+                $this->copyStreamToStream($data->stream, $exportStream, $data->reportType);
                 fclose($data->stream);
             }
         }
 
-        foreach ($exportData as $partner => $reportData) {
-            foreach ($reportData as $report => $reportStream) {
-                $filesystem->putStream($exportPath . '/' . $partner . '/' . $report . '.csv', $reportStream);
-            }
+        foreach ($exportData as $report => $reportStream) {
+            $filesystem->putStream($exportPath . '/' . $report . '.csv', $reportStream);
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @param resource $source phpcs:ignore
+     * @param resource $target phpcs:ignore
+     */
+    private function copyStreamToStream($source, $target, string $reportType): void // phpcs:ignore
+    {
+        if (ToSkuTransformer::TYPE !== $reportType) {
+            stream_copy_to_stream($source, $target);
+
+            return;
+        }
+
+        while (!feof($source)) {
+            $line = fgets($source);
+            $hash = sha1($line); // phpcs:ignore
+
+            if (isset($this->skuLineHashes[$hash])) {
+                continue;
+            }
+
+            $this->skuLineHashes[$hash] = true;
+            fwrite($target, $line);
+        }
     }
 
     private function makePath(string $inputPath, Filesystem $filesystem): string

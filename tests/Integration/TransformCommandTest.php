@@ -17,21 +17,32 @@ class TransformCommandTest extends TestCase
     public function test(): void
     {
         $output = $this->createConfiguredMock(OutputInterface::class, []);
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->method('getArgument')
-            ->willReturnOnConsecutiveCalls(__DIR__ . '/PartnerReports/', __DIR__ . '/TempTransformedReports/');
-        $filesystem = new Filesystem(new Local(__DIR__));
-        $filesystem->addPlugin(new ListFiles());
-        $filesystem->createDir('TempTransformedReports');
 
-        (new TransformCommand())->execute($input, $output);
 
-        foreach ($filesystem->listFiles('TransformedReports/', true) as $expectedFile) {
-            self::assertFileEquals(
-                $expectedFile['path'],
-                str_replace('TransformedReports', 'TempTransformedReports', $expectedFile['path'])
-            );
+        foreach (['badm', 'venta', 'optima'] as $partner) {
+            $input = $this->createMock(InputInterface::class);
+            $input
+                ->method('getArgument')
+                ->willReturnOnConsecutiveCalls(
+                    __DIR__ . '/PartnerReports/' . $partner,
+                    __DIR__ . '/TempTransformedReports/' . $partner . '/'
+                );
+            $filesystem = new Filesystem(new Local(__DIR__));
+            $filesystem->addPlugin(new ListFiles());
+            $filesystem->createDir('TempTransformedReports/' . $partner);
+
+            (new TransformCommand())->execute($input, $output);
+
+            foreach ($filesystem->listFiles('TransformedReports/' . $partner, true) as $expectedFile) {
+                $actualFilePath = str_replace('TransformedReports', 'TempTransformedReports', $expectedFile['path']);
+                self::assertFileEquals(
+                    $expectedFile['path'],
+                    $actualFilePath,
+                    sprintf('Files %s and %s are not equal', $expectedFile['path'], $actualFilePath)
+                );
+            }
+
+            $filesystem->deleteDir('TempTransformedReports/' . $partner);
         }
 
         $filesystem->deleteDir('TempTransformedReports');
