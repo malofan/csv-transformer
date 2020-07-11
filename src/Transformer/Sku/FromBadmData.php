@@ -43,7 +43,7 @@ class FromBadmData extends ToSkuTransformer
             $record['Товар'],
             $barcode,
             null,
-            '1 (штука)'
+            '1'
         );
     }
 

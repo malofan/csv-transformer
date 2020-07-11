@@ -34,7 +34,7 @@ class FromVentaData extends ToSkuTransformer
             $record['Товар'],
             null,
             null,
-            '1 (штука)'
+            '1'
         );
     }
 
