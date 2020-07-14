@@ -43,7 +43,7 @@ class FromOptimaData extends ToDeliveryTransformer
             DateTimeImmutable::createFromFormat('d.m.Y', $record['День']) ?: null,
             $record['Код товара'],
             (float)$record['Продажи шт'],
-            null,
+            0,
             null
         );
     }

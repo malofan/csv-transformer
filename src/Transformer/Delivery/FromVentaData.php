@@ -41,7 +41,7 @@ class FromVentaData extends ToDeliveryTransformer
             DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накладной']) ?: null,
             $record['Код товара'],
             (float)$record['Количество'],
-            null,
+            0,
             null
         );
     }
