@@ -9,8 +9,9 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Plugin\ListFiles;
 use Spot\CsvTransformer;
 use Spot\Exception\SpotException;
-use Spot\Transformer\Sku\ToSkuTransformer;
-use Spot\Transformer\Ttoptions\ToTtoptionsTransformer;
+use Spot\ExportReportTypes;
+use Spot\Transformer\FromSales\Sku\ToSkuTransformer;
+use Spot\Transformer\FromSales\Ttoptions\ToTtoptionsTransformer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,7 +85,7 @@ class TransformCommand extends Command
      */
     private function copyStreamToStream($source, $target, string $reportType): void // phpcs:ignore
     {
-        if (!in_array($reportType, [ToSkuTransformer::TYPE, ToTtoptionsTransformer::TYPE], true)) {
+        if (!in_array($reportType, [ExportReportTypes::SKU, ExportReportTypes::TTOPTIONS], true)) {
             stream_copy_to_stream($source, $target);
 
             return;

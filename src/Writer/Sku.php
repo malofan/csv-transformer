@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\SkuRecord;
-use Spot\Transformer\Sku\ToSkuTransformer;
+use Spot\ExportReportTypes;
 
 class Sku extends BaseWriter
 {
@@ -43,6 +43,6 @@ class Sku extends BaseWriter
 
     public static function supports(string $reportType): bool
     {
-        return ToSkuTransformer::TYPE === $reportType;
+        return ExportReportTypes::SKU === $reportType;
     }
 }

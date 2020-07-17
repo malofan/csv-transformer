@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\DeliveryRecord;
-use Spot\Transformer\Delivery\ToDeliveryTransformer;
+use Spot\ExportReportTypes;
 
 class Delivery extends BaseWriter
 {
@@ -45,6 +45,6 @@ class Delivery extends BaseWriter
 
     public static function supports(string $reportType): bool
     {
-        return ToDeliveryTransformer::TYPE === $reportType;
+        return ExportReportTypes::DELIVERY === $reportType;
     }
 }

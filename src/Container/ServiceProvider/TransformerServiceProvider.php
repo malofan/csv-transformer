@@ -6,28 +6,31 @@ namespace Spot\Container\ServiceProvider;
 
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Spot\Repository\DistributorRepository;
-use Spot\Transformer\Delivery\FromBadmData;
-use Spot\Transformer\Delivery\FromOptimaData;
-use Spot\Transformer\Delivery\FromVentaData;
-use Spot\Transformer\Sku\FromBadmData as SkuFromBadmData;
-use Spot\Transformer\Sku\FromOptimaData as SkuFromOptimaData;
-use Spot\Transformer\Sku\FromVentaData as SkuFromVentaData;
-use Spot\Transformer\Stock\FromBadmData as StockFromBadmData;
-use Spot\Transformer\Stock\FromOptimaData as StockFromOptimaData;
-use Spot\Transformer\Stock\FromVentaData as StockFromVentaData;
+use Spot\Transformer\FromSales\Badm\ToDelivery as DeliverFromBadmData;
+use Spot\Transformer\FromSales\Optima\ToDelivery as DeliverFromOptimaData;
+use Spot\Transformer\FromSales\Venta\ToDelivery as DeliverFromVentaData;
+use Spot\Transformer\FromSales\Badm\ToSku as SkuFromBadmData;
+use Spot\Transformer\FromSales\Optima\ToSku as SkuFromOptimaData;
+use Spot\Transformer\FromSales\Venta\ToSku as SkuFromVentaData;
+use Spot\Transformer\FromStock\Badm\ToSku as SkuFromBadmStockData;
+use Spot\Transformer\FromStock\Badm\ToStocks as StockFromBadmData;
+use Spot\Transformer\FromStock\Optima\ToSku as SkuFromOptimaStockData;
+use Spot\Transformer\FromStock\Optima\ToStocks as StockFromOptimaData;
+use Spot\Transformer\FromStock\Venta\ToSku as SkuFromVentaStockData;
+use Spot\Transformer\FromStock\Venta\ToStocks as StockFromVentaData;
 use Spot\Transformer\TransformerProvider;
 use Spot\Transformer\TransformerStrategy;
-use Spot\Transformer\Ttoptions\FromBadmData as TtoptionsFromBadmData;
-use Spot\Transformer\Ttoptions\FromOptimaData as TtoptionsFromOptimaData;
-use Spot\Transformer\Ttoptions\FromVentaData as TtoptionsFromVentaData;
+use Spot\Transformer\FromSales\Badm\ToTtoptions as TtoptionsFromBadmData;
+use Spot\Transformer\FromSales\Optima\ToTtoptions as TtoptionsFromOptimaData;
+use Spot\Transformer\FromSales\Venta\ToTtoptions as TtoptionsFromVentaData;
 
 class TransformerServiceProvider extends AbstractServiceProvider
 {
     protected $provides = [
         TransformerProvider::class,
-        FromBadmData::class,
-        FromOptimaData::class,
-        FromVentaData::class,
+        DeliverFromBadmData::class,
+        DeliverFromOptimaData::class,
+        DeliverFromVentaData::class,
         SkuFromBadmData::class,
         SkuFromOptimaData::class,
         SkuFromVentaData::class,
@@ -37,20 +40,23 @@ class TransformerServiceProvider extends AbstractServiceProvider
         TtoptionsFromBadmData::class,
         TtoptionsFromOptimaData::class,
         TtoptionsFromVentaData::class,
+        SkuFromBadmStockData::class,
+        SkuFromOptimaStockData::class,
+        SkuFromVentaStockData::class,
     ];
 
     public function register(): void
     {
         $this->getContainer()
-            ->add(FromBadmData::class)
+            ->add(DeliverFromBadmData::class)
             ->addArgument(DistributorRepository::class)
             ->addTag(TransformerStrategy::TAG_NAME);
         $this->getContainer()
-            ->add(FromOptimaData::class)
+            ->add(DeliverFromOptimaData::class)
             ->addArgument(DistributorRepository::class)
             ->addTag(TransformerStrategy::TAG_NAME);
         $this->getContainer()
-            ->add(FromVentaData::class)
+            ->add(DeliverFromVentaData::class)
             ->addArgument(DistributorRepository::class)
             ->addTag(TransformerStrategy::TAG_NAME);
         $this->getContainer()
@@ -87,6 +93,18 @@ class TransformerServiceProvider extends AbstractServiceProvider
             ->addTag(TransformerStrategy::TAG_NAME);
         $this->getContainer()
             ->add(TtoptionsFromVentaData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(TransformerStrategy::TAG_NAME);
+        $this->getContainer()
+            ->add(SkuFromBadmStockData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(TransformerStrategy::TAG_NAME);
+        $this->getContainer()
+            ->add(SkuFromOptimaStockData::class)
+            ->addArgument(DistributorRepository::class)
+            ->addTag(TransformerStrategy::TAG_NAME);
+        $this->getContainer()
+            ->add(SkuFromVentaStockData::class)
             ->addArgument(DistributorRepository::class)
             ->addTag(TransformerStrategy::TAG_NAME);
 

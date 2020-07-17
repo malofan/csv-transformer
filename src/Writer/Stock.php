@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\StockRecord;
-use Spot\Transformer\Stock\ToStockTransformer;
+use Spot\ExportReportTypes;
 
 class Stock extends BaseWriter
 {
@@ -45,6 +45,6 @@ class Stock extends BaseWriter
 
     public static function supports(string $reportType): bool
     {
-        return ToStockTransformer::TYPE === $reportType;
+        return ExportReportTypes::STOCKS === $reportType;
     }
 }

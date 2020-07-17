@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spot\Writer;
 
 use Spot\DTO\TtoptionsRecord;
-use Spot\Transformer\Ttoptions\ToTtoptionsTransformer;
+use Spot\ExportReportTypes;
 
 class Ttoptions extends BaseWriter
 {
@@ -45,6 +45,6 @@ class Ttoptions extends BaseWriter
 
     public static function supports(string $reportType): bool
     {
-        return ToTtoptionsTransformer::TYPE === $reportType;
+        return ExportReportTypes::TTOPTIONS === $reportType;
     }
 }
