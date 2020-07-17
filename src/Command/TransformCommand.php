@@ -93,14 +93,9 @@ class TransformCommand extends Command
         // TODO: If you need to add some logic here - refactor this part. Extract Filter service.
         while (!feof($source)) {
             $line = fgets($source);
-
-            if (ToSkuTransformer::TYPE === $reportType) {
-                $hash = sha1($line); // phpcs:ignore
-            } else {
-                $parts = explode(';', $line);
-                // uniqueness by id and erp code
-                $hash = sha1($parts[0] . $parts[1]); // phpcs:ignore
-            }
+            $parts = explode(';', $line);
+            // uniqueness by id and code
+            $hash = sha1($parts[0] . $parts[1]); // phpcs:ignore
 
             if (isset($this->lineHashes[$hash])) {
                 continue;
