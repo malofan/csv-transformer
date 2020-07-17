@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Ttoptions;
+namespace Spot\Transformer\FromSales\Venta;
 
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromVentaData extends ToTtoptionsTransformer
+class ToTtoptions extends FromVenta
 {
     /**
      * @return string[]
@@ -31,11 +30,7 @@ class FromVentaData extends ToTtoptionsTransformer
     protected function transformRecord(array $record): TtoptionsRecord
     {
         return new TtoptionsRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Склад'],
-                PartnerTypes::VENTA,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Склад']),
             $record['UID пункта доставки'],
             $record['Клиент'],
             $record['Адрес дост.'],
@@ -52,8 +47,8 @@ class FromVentaData extends ToTtoptionsTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::VENTA;
+        return ExportReportTypes::TTOPTIONS;
     }
 }

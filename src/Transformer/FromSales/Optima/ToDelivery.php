@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer\FromSales\Optima;
 
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromOptimaData extends ToDeliveryTransformer
+class ToDelivery extends FromOptima
 {
     /**
      * @return string[]
@@ -34,11 +33,7 @@ class FromOptimaData extends ToDeliveryTransformer
         preg_match('/\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
         return new DeliveryRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Филиал'],
-                PartnerTypes::OPTIMA,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Филиал']),
             $erpCodeMatch[1] ?? '',
             DateTimeImmutable::createFromFormat('d.m.Y', $record['День']) ?: null,
             $record['Код товара'],
@@ -57,8 +52,8 @@ class FromOptimaData extends ToDeliveryTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::OPTIMA;
+        return ExportReportTypes::DELIVERY;
     }
 }

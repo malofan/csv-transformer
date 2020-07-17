@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Stock;
+namespace Spot\Transformer\FromStock\Badm;
 
 use DateTimeImmutable;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromBadmData extends ToStockTransformer
+class ToStocks extends FromBadm
 {
     /**
      * @return string[]
@@ -31,11 +30,7 @@ class FromBadmData extends ToStockTransformer
     protected function transformRecord(array $record): StockRecord
     {
         return new StockRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Филиал'],
-                PartnerTypes::BADM,
-                FileMetaDataStrategy::REPORT_TYPE_STOCK
-            ),
+            $this->getDistributorIdBy($record['Филиал']),
             new DateTimeImmutable(),
             $record['Код товара'],
             (int)$record['Количество реальное'],
@@ -54,8 +49,8 @@ class FromBadmData extends ToStockTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::BADM;
+        return ExportReportTypes::STOCKS;
     }
 }

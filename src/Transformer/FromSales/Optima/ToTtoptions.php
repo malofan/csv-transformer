@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Ttoptions;
+namespace Spot\Transformer\FromSales\Optima;
 
 use Spot\DTO\TtoptionsRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromOptimaData extends ToTtoptionsTransformer
+class ToTtoptions extends FromOptima
 {
     /**
      * @return string[]
@@ -27,15 +26,11 @@ class FromOptimaData extends ToTtoptionsTransformer
         preg_match('/(.+)\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
 
         return new TtoptionsRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Филиал'],
-                PartnerTypes::OPTIMA,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Филиал']),
             $erpCodeMatch[2] ?? '',
             trim($erpCodeMatch[1] ?? ''),
             $record['Фактический адрес'],
-            $record['ОКПО'],
+            $record['ОКПО']
         );
     }
 
@@ -48,8 +43,8 @@ class FromOptimaData extends ToTtoptionsTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::OPTIMA;
+        return ExportReportTypes::TTOPTIONS;
     }
 }

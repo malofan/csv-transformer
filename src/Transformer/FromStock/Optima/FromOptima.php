@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Stock;
+namespace Spot\Transformer\FromStock\Optima;
 
-use DateTimeImmutable;
 use Iterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
+use Spot\Transformer\FromStock\FromStockTransformer;
 
-class FromOptimaData extends ToStockTransformer
+abstract class FromOptima extends FromStockTransformer
 {
     /**
      * @return string[]
@@ -19,6 +19,15 @@ class FromOptimaData extends ToStockTransformer
     protected function getRequiredRecordFields(): array
     {
         return [];
+    }
+
+    protected function getDistributorIdBy($name): int
+    {
+        return $this->distributorRepository->getIdBy(
+            $name,
+            PartnerTypes::OPTIMA,
+            FileMetaDataStrategy::REPORT_TYPE_STOCK
+        );
     }
 
     /**
@@ -33,27 +42,27 @@ class FromOptimaData extends ToStockTransformer
         }
 
         $productCode = $record[array_search('Код товара', $header)];
+        $productName = $record[array_search('Код товара', $header)];
 
         foreach ($header as $index => $fieldName) {
             if (in_array($fieldName, ['Товар', 'Код товара', 'Все', ''], true)) {
                 continue;
             }
 
-            yield new StockRecord(
-                $this->distributorRepository->getIdBy(
-                    $fieldName,
-                    PartnerTypes::OPTIMA,
-                    FileMetaDataStrategy::REPORT_TYPE_STOCK
-                ),
-                new DateTimeImmutable(),
-                $productCode,
-                (int)$record[$index] + (int)$record[$index + 1],
-                null,
-                null,
-                null
-            );
+            yield $this->createRecord($record, $productCode, $productName, $index, $fieldName);
         }
     }
+
+    /**
+     * @param string[] $record
+     */
+    abstract protected function createRecord(
+        array $record,
+        string $productCode,
+        string $productName,
+        int $index,
+        string $distributorName
+    ); // phpcs:ignore
 
     /**
      * @return StockRecord[]

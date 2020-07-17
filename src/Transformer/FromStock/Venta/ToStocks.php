@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Stock;
+namespace Spot\Transformer\FromStock\Venta;
 
 use DateTimeImmutable;
 use Iterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
+use Spot\ExportReportTypes;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;
 
-class FromVentaData extends ToStockTransformer
+class ToStocks extends FromVenta
 {
     /**
      * @return string[]
@@ -48,33 +49,24 @@ class FromVentaData extends ToStockTransformer
         }
     }
 
-    /**
-     * @param mixed[] $record
-     * @return StockRecord[]
-     * @throws InvalidRecordException
-     */
-    public function transform(array $record): iterable
+    public function getType(): string
     {
-        return parent::transform($record);
+        return ExportReportTypes::STOCKS;
     }
 
     /**
-     * @return StockRecord[]
-     * @throws InvalidRecordException
+     * @param string[] $record
      */
-    public function transformAll(Iterator $records): iterable
+    protected function createRecord(array $record, int $distributorId, int $qty): StockRecord
     {
-        foreach ($records as $record) {
-            if ($this->isEmptyRow($record)) {
-                continue;
-            }
-
-            yield from $this->transform($record);
-        }
-    }
-
-    public function getPartnerType(): string
-    {
-        return PartnerTypes::VENTA;
+        return new StockRecord(
+            $distributorId,
+            new DateTimeImmutable(),
+            $record['Наименование Препарата'],
+            $qty,
+            null,
+            null,
+            null
+        );
     }
 }

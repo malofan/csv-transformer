@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer;
+namespace Spot\Transformer\FromSales;
 
 use Spot\FileMetaData\FileMetaDataStrategy;
+use Spot\Transformer\FromPartnerData;
+use Spot\Transformer\TransformerStrategy;
 
 abstract class FromSalesTransformer extends FromPartnerData implements TransformerStrategy
 {

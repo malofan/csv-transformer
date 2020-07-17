@@ -8,7 +8,7 @@ use ArrayIterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
-use Spot\Transformer\Stock\FromBadmData;
+use Spot\Transformer\FromStock\Badm\ToStocks;
 use PHPUnit\Framework\TestCase;
 
 class FromBadmTest extends TestCase
@@ -19,7 +19,7 @@ class FromBadmTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->supports('badm', 'stock')
+            (new \Spot\Transformer\FromStock\Badm\ToStocks($this->createMock(DistributorRepository::class)))->supports('badm', 'stock')
         );
     }
 
@@ -29,7 +29,7 @@ class FromBadmTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromBadmData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new \Spot\Transformer\FromStock\Badm\ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -46,7 +46,7 @@ class FromBadmTest extends TestCase
 
         $this->assertInstanceOf(
             StockRecord::class,
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->transformAll(
+            (new ToStocks($this->createMock(DistributorRepository::class)))->transformAll(
                 new ArrayIterator([$record])
             )->current()
         );
@@ -57,7 +57,7 @@ class FromBadmTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame('badm', (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType());
+        self::assertSame('badm', (new \Spot\Transformer\FromStock\Badm\ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -65,6 +65,6 @@ class FromBadmTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stocks', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new \Spot\Transformer\FromStock\Badm\ToStocks($this->createMock(DistributorRepository::class)))->getType());
     }
 }

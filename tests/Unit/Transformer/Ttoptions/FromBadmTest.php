@@ -6,7 +6,7 @@ namespace Spot\Tests\Unit\Transformer\Ttoptions;
 
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
-use Spot\Transformer\Ttoptions\FromBadmData;
+use Spot\Transformer\FromSales\Badm\ToTtoptions;
 use PHPUnit\Framework\TestCase;
 
 class FromBadmTest extends TestCase
@@ -17,7 +17,7 @@ class FromBadmTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new FromBadmData($this->createMock(DistributorRepository::class)))->supports('badm', 'sales')
+            (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->supports('badm', 'sales')
         );
     }
 
@@ -27,7 +27,7 @@ class FromBadmTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromBadmData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -35,7 +35,7 @@ class FromBadmTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame('badm', (new FromBadmData($this->createMock(DistributorRepository::class)))->getPartnerType());
+        self::assertSame('badm', (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -43,6 +43,6 @@ class FromBadmTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('ttoptions', (new FromBadmData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('ttoptions', (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->getType());
     }
 }

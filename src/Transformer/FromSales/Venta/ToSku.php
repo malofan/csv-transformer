@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Sku;
+namespace Spot\Transformer\FromSales\Venta;
 
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromOptimaData extends ToSkuTransformer
+class ToSku extends FromVenta
 {
     /**
      * @return string[]
      */
     protected function getRequiredRecordFields(): array
     {
-        return ['Филиал', 'Код товара', 'Товар'];
+        return ['Склад', 'Код товара', 'Товар'];
     }
 
     /**
@@ -24,19 +23,13 @@ class FromOptimaData extends ToSkuTransformer
      */
     protected function transformRecord(array $record): SkuRecord
     {
-        preg_match('/(.+)\((\d+)\)/', $record['Дебитор доставки'], $erpCodeMatch);
-
         return new SkuRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Филиал'],
-                PartnerTypes::OPTIMA,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Склад']),
             $record['Код товара'],
             $record['Товар'],
             null,
             null,
-            null
+            '1'
         );
     }
 
@@ -49,8 +42,8 @@ class FromOptimaData extends ToSkuTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::OPTIMA;
+        return ExportReportTypes::SKU;
     }
 }

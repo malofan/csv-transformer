@@ -2,21 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Sku;
+namespace Spot\Transformer\FromSales\Badm;
 
 use Spot\DTO\SkuRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromVentaData extends ToSkuTransformer
+class ToSku extends FromBadm
 {
     /**
      * @return string[]
      */
     protected function getRequiredRecordFields(): array
     {
-        return ['Склад', 'Код товара', 'Товар'];
+        return [
+            'Склад/филиал',
+            'Код товара',
+            'Товар',
+            'Штрих-код товара',
+        ];
     }
 
     /**
@@ -24,15 +28,15 @@ class FromVentaData extends ToSkuTransformer
      */
     protected function transformRecord(array $record): SkuRecord
     {
+        $barcode = strpos($record['Штрих-код товара'], 'E+') !== false
+            ? sprintf('%d', str_replace(',', '.', $record['Штрих-код товара']))
+            : $record['Штрих-код товара'];
+
         return new SkuRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Склад'],
-                PartnerTypes::VENTA,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Склад/филиал']),
             $record['Код товара'],
             $record['Товар'],
-            null,
+            $barcode,
             null,
             '1'
         );
@@ -47,8 +51,8 @@ class FromVentaData extends ToSkuTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::VENTA;
+        return ExportReportTypes::SKU;
     }
 }

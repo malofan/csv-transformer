@@ -8,7 +8,7 @@ use ArrayIterator;
 use Spot\DTO\StockRecord;
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
-use Spot\Transformer\Stock\FromVentaData;
+use Spot\Transformer\FromStock\Venta\ToStocks;
 use PHPUnit\Framework\TestCase;
 
 class FromVentaTest extends TestCase
@@ -19,7 +19,7 @@ class FromVentaTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new FromVentaData($this->createMock(DistributorRepository::class)))->supports('venta', 'stock')
+            (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->supports('venta', 'stock')
         );
     }
 
@@ -29,7 +29,7 @@ class FromVentaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromVentaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -47,7 +47,7 @@ class FromVentaTest extends TestCase
         $repo = $this->createMock(DistributorRepository::class);
         $repo->method('getIdBy')->willReturn(10);
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new FromVentaData($repo))->transformAll(new ArrayIterator([$record]))->current();
+        $stockRecord = (new \Spot\Transformer\FromStock\Venta\ToStocks($repo))->transformAll(new ArrayIterator([$record]))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
         $this->assertSame(10, $stockRecord->distributorId);
@@ -61,7 +61,7 @@ class FromVentaTest extends TestCase
     {
         self::assertSame(
             'venta',
-            (new FromVentaData($this->createMock(DistributorRepository::class)))->getPartnerType()
+            (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType()
         );
     }
 
@@ -70,6 +70,6 @@ class FromVentaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stocks', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->getType());
     }
 }

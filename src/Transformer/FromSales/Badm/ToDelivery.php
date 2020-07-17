@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spot\Transformer\Delivery;
+namespace Spot\Transformer\FromSales\Badm;
 
 use DateTimeImmutable;
 use Spot\DTO\DeliveryRecord;
 use Spot\Exception\InvalidRecordException;
-use Spot\FileMetaData\FileMetaDataStrategy;
-use Spot\PartnerTypes;
+use Spot\ExportReportTypes;
 
-class FromBadmData extends ToDeliveryTransformer
+class ToDelivery extends FromBadm
 {
     /**
      * @return string[]
@@ -32,11 +31,7 @@ class FromBadmData extends ToDeliveryTransformer
     protected function transformRecord(array $record): DeliveryRecord
     {
         return new DeliveryRecord(
-            $this->distributorRepository->getIdBy(
-                $record['Склад/филиал'],
-                PartnerTypes::BADM,
-                FileMetaDataStrategy::REPORT_TYPE_SALES
-            ),
+            $this->getDistributorIdBy($record['Склад/филиал']),
             $record['Код подразд кл'],
             DateTimeImmutable::createFromFormat('d.m.Y', $record['Дата накл']) ?: null,
             $record['Код товара'],
@@ -55,8 +50,8 @@ class FromBadmData extends ToDeliveryTransformer
         return parent::transform($record);
     }
 
-    public function getPartnerType(): string
+    public function getType(): string
     {
-        return PartnerTypes::BADM;
+        return ExportReportTypes::DELIVERY;
     }
 }

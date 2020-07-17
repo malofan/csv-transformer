@@ -6,7 +6,7 @@ namespace Spot\Tests\Unit\Transformer\Sku;
 
 use Spot\Exception\InvalidRecordException;
 use Spot\Repository\DistributorRepository;
-use Spot\Transformer\Sku\FromVentaData;
+use Spot\Transformer\FromSales\Venta\ToSku;
 use PHPUnit\Framework\TestCase;
 
 class FromVentaTest extends TestCase
@@ -17,7 +17,7 @@ class FromVentaTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new FromVentaData($this->createMock(DistributorRepository::class)))->supports('venta', 'sales')
+            (new \Spot\Transformer\FromSales\Venta\ToSku($this->createMock(DistributorRepository::class)))->supports('venta', 'sales')
         );
     }
 
@@ -27,7 +27,7 @@ class FromVentaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new FromVentaData($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new \Spot\Transformer\FromSales\Venta\ToSku($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -37,7 +37,7 @@ class FromVentaTest extends TestCase
     {
         self::assertSame(
             'venta',
-            (new FromVentaData($this->createMock(DistributorRepository::class)))->getPartnerType()
+            (new ToSku($this->createMock(DistributorRepository::class)))->getPartnerType()
         );
     }
 
@@ -46,6 +46,6 @@ class FromVentaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('sku', (new FromVentaData($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('sku', (new \Spot\Transformer\FromSales\Venta\ToSku($this->createMock(DistributorRepository::class)))->getType());
     }
 }
