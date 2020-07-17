@@ -18,9 +18,7 @@ class FromOptimaTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(
-            (new \Spot\Transformer\FromStock\Optima\ToStocks($this->createMock(DistributorRepository::class)))->supports('optima', 'stock')
-        );
+        self::assertTrue((new ToStocks($this->createMock(DistributorRepository::class)))->supports('optima', 'stock'));
     }
 
     /**
@@ -29,8 +27,7 @@ class FromOptimaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new \Spot\Transformer\FromStock\Optima\ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3], [1, 2, 3])->current(
-        );
+        (new ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3], [1, 2, 3])->current();
     }
 
     /**
@@ -48,7 +45,7 @@ class FromOptimaTest extends TestCase
         $repo->method('getIdBy')->willReturn(10);
 
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new \Spot\Transformer\FromStock\Optima\ToStocks($repo))->transformAll(new ArrayIterator($records))->current();
+        $stockRecord = (new ToStocks($repo))->transformAll(new ArrayIterator($records))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
         $this->assertSame(10, $stockRecord->distributorId);
@@ -60,10 +57,7 @@ class FromOptimaTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'optima',
-            (new \Spot\Transformer\FromStock\Optima\ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('optima', (new ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**

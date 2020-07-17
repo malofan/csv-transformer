@@ -9,7 +9,10 @@ use Spot\ExportReportTypes;
 
 class ToSku extends FromVenta
 {
-    protected function createRecord(array $record, int $distributorId, int $qty)
+    /**
+     * @param string[] $record
+     */
+    protected function createRecord(array $record, int $distributorId, int $qty): SkuRecord
     {
         return new SkuRecord(
             $distributorId,

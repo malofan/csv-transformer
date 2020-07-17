@@ -10,8 +10,6 @@ use League\Flysystem\Plugin\ListFiles;
 use Spot\CsvTransformer;
 use Spot\Exception\SpotException;
 use Spot\ExportReportTypes;
-use Spot\Transformer\FromSales\Sku\ToSkuTransformer;
-use Spot\Transformer\FromSales\Ttoptions\ToTtoptionsTransformer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

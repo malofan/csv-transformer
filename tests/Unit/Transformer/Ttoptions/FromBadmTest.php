@@ -16,9 +16,7 @@ class FromBadmTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(
-            (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->supports('badm', 'sales')
-        );
+        self::assertTrue((new ToTtoptions($this->createMock(DistributorRepository::class)))->supports('badm', 'sales'));
     }
 
     /**
@@ -27,7 +25,7 @@ class FromBadmTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new ToTtoptions($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -35,7 +33,7 @@ class FromBadmTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame('badm', (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->getPartnerType());
+        self::assertSame('badm', (new ToTtoptions($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -43,6 +41,6 @@ class FromBadmTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('ttoptions', (new \Spot\Transformer\FromSales\Badm\ToTtoptions($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('ttoptions', (new ToTtoptions($this->createMock(DistributorRepository::class)))->getType());
     }
 }

@@ -16,9 +16,7 @@ class FromOptimaTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(
-            (new ToSku($this->createMock(DistributorRepository::class)))->supports('optima', 'sales')
-        );
+        self::assertTrue((new ToSku($this->createMock(DistributorRepository::class)))->supports('optima', 'sales'));
     }
 
     /**
@@ -27,7 +25,7 @@ class FromOptimaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new \Spot\Transformer\FromSales\Optima\ToSku($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new ToSku($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -35,10 +33,7 @@ class FromOptimaTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'optima',
-            (new ToSku($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('optima', (new ToSku($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -46,6 +41,6 @@ class FromOptimaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('sku', (new \Spot\Transformer\FromSales\Optima\ToSku($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('sku', (new ToSku($this->createMock(DistributorRepository::class)))->getType());
     }
 }

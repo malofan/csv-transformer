@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Spot\Transformer\FromStock\Venta;
 
 use DateTimeImmutable;
-use Iterator;
 use Spot\DTO\StockRecord;
-use Spot\Exception\InvalidRecordException;
 use Spot\ExportReportTypes;
 use Spot\FileMetaData\FileMetaDataStrategy;
 use Spot\PartnerTypes;

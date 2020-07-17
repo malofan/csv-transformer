@@ -15,7 +15,7 @@ abstract class FromVenta extends FromSalesTransformer
         return PartnerTypes::VENTA;
     }
 
-    protected function getDistributorIdBy($name): int
+    protected function getDistributorIdBy(string $name): int
     {
         return $this->distributorRepository->getIdBy(
             $name,

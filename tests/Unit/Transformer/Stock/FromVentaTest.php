@@ -18,9 +18,7 @@ class FromVentaTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(
-            (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->supports('venta', 'stock')
-        );
+        self::assertTrue((new ToStocks($this->createMock(DistributorRepository::class)))->supports('venta', 'stock'));
     }
 
     /**
@@ -29,7 +27,7 @@ class FromVentaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new ToStocks($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -47,7 +45,7 @@ class FromVentaTest extends TestCase
         $repo = $this->createMock(DistributorRepository::class);
         $repo->method('getIdBy')->willReturn(10);
         /** @var StockRecord $stockRecord */
-        $stockRecord = (new \Spot\Transformer\FromStock\Venta\ToStocks($repo))->transformAll(new ArrayIterator([$record]))->current();
+        $stockRecord = (new ToStocks($repo))->transformAll(new ArrayIterator([$record]))->current();
 
         $this->assertInstanceOf(StockRecord::class, $stockRecord);
         $this->assertSame(10, $stockRecord->distributorId);
@@ -59,10 +57,7 @@ class FromVentaTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'venta',
-            (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('venta', (new ToStocks($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -70,6 +65,6 @@ class FromVentaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('stocks', (new \Spot\Transformer\FromStock\Venta\ToStocks($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('stocks', (new ToStocks($this->createMock(DistributorRepository::class)))->getType());
     }
 }

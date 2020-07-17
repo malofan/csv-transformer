@@ -16,9 +16,7 @@ class FromBadmTest extends TestCase
      */
     public function supports(): void
     {
-        self::assertTrue(
-            (new \Spot\Transformer\FromSales\Badm\ToSku($this->createMock(DistributorRepository::class)))->supports('badm', 'sales')
-        );
+        self::assertTrue((new ToSku($this->createMock(DistributorRepository::class)))->supports('badm', 'sales'));
     }
 
     /**
@@ -35,7 +33,7 @@ class FromBadmTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame('badm', (new \Spot\Transformer\FromSales\Badm\ToSku($this->createMock(DistributorRepository::class)))->getPartnerType());
+        self::assertSame('badm', (new ToSku($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**

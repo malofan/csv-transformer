@@ -21,7 +21,7 @@ abstract class FromOptima extends FromStockTransformer
         return [];
     }
 
-    protected function getDistributorIdBy($name): int
+    protected function getDistributorIdBy(string $name): int
     {
         return $this->distributorRepository->getIdBy(
             $name,
@@ -56,13 +56,13 @@ abstract class FromOptima extends FromStockTransformer
     /**
      * @param string[] $record
      */
-    abstract protected function createRecord(
+    abstract protected function createRecord( // phpcs:ignore
         array $record,
         string $productCode,
         string $productName,
         int $index,
         string $distributorName
-    ); // phpcs:ignore
+    );
 
     /**
      * @return StockRecord[]

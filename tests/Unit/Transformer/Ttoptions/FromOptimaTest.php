@@ -17,7 +17,7 @@ class FromOptimaTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new \Spot\Transformer\FromSales\Optima\ToTtoptions($this->createMock(DistributorRepository::class)))->supports('optima', 'sales')
+            (new ToTtoptions($this->createMock(DistributorRepository::class)))->supports('optima', 'sales')
         );
     }
 
@@ -27,7 +27,7 @@ class FromOptimaTest extends TestCase
     public function transform(): void
     {
         $this->expectException(InvalidRecordException::class);
-        (new \Spot\Transformer\FromSales\Optima\ToTtoptions($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
+        (new ToTtoptions($this->createMock(DistributorRepository::class)))->transform([1, 2, 3]);
     }
 
     /**
@@ -37,7 +37,7 @@ class FromOptimaTest extends TestCase
     {
         self::assertSame(
             'optima',
-            (new \Spot\Transformer\FromSales\Optima\ToTtoptions($this->createMock(DistributorRepository::class)))->getPartnerType()
+            (new ToTtoptions($this->createMock(DistributorRepository::class)))->getPartnerType()
         );
     }
 

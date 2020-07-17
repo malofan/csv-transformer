@@ -15,7 +15,7 @@ abstract class FromBadm extends FromSalesTransformer
         return PartnerTypes::BADM;
     }
 
-    protected function getDistributorIdBy($name): int
+    protected function getDistributorIdBy(string $name): int
     {
         return $this->distributorRepository->getIdBy(
             $name,

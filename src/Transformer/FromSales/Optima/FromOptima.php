@@ -15,7 +15,7 @@ abstract class FromOptima extends FromSalesTransformer
         return PartnerTypes::OPTIMA;
     }
 
-    protected function getDistributorIdBy($name): int
+    protected function getDistributorIdBy(string $name): int
     {
         return $this->distributorRepository->getIdBy(
             $name,

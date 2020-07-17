@@ -17,7 +17,7 @@ class FromOptimaTest extends TestCase
     public function supports(): void
     {
         self::assertTrue(
-            (new \Spot\Transformer\FromSales\Optima\ToDelivery($this->createMock(DistributorRepository::class)))->supports('optima', 'sales')
+            (new ToDelivery($this->createMock(DistributorRepository::class)))->supports('optima', 'sales')
         );
     }
 
@@ -35,10 +35,7 @@ class FromOptimaTest extends TestCase
      */
     public function getPartnerType(): void
     {
-        self::assertSame(
-            'optima',
-            (new ToDelivery($this->createMock(DistributorRepository::class)))->getPartnerType()
-        );
+        self::assertSame('optima', (new ToDelivery($this->createMock(DistributorRepository::class)))->getPartnerType());
     }
 
     /**
@@ -46,6 +43,6 @@ class FromOptimaTest extends TestCase
      */
     public function getType(): void
     {
-        self::assertSame('delivery', (new \Spot\Transformer\FromSales\Optima\ToDelivery($this->createMock(DistributorRepository::class)))->getType());
+        self::assertSame('delivery', (new ToDelivery($this->createMock(DistributorRepository::class)))->getType());
     }
 }
