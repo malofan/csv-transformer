@@ -53,7 +53,7 @@ class CsvTransformer
         $data = $this->guesser->guessBy($stream);
 
         foreach ($this->transformers->getFor($data->partnerType, $data->reportType) as $transformer) {
-            $writer = $this->writerFactory->getFor($transformer->getType());
+            $writer = $this->writerFactory->getFor($transformer->getType(), $data->partnerType);
             $writer->insertRecords($transformer->transformAll($data->records));
 
             yield $writer->getData($data->partnerType, $transformer->getType());
@@ -70,7 +70,7 @@ class CsvTransformer
         $records = $this->reader->read($stream, $fileMetaData)->getRecords();
 
         foreach ($this->transformers->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES) as $transformer) {
-            $writer = $this->writerFactory->getFor($transformer->getType());
+            $writer = $this->writerFactory->getFor($transformer->getType(), $partnerType);
             $writer->insertRecords($transformer->transformAll($records));
 
             yield $writer->getData($partnerType, FileMetaDataStrategy::REPORT_TYPE_SALES);
@@ -82,7 +82,7 @@ class CsvTransformer
      */
     public function transformStockData($stream, string $partnerType): TransformedData // phpcs:ignore
     {
-        $writer = $this->writerFactory->getFor(FileMetaDataStrategy::REPORT_TYPE_STOCK);
+        $writer = $this->writerFactory->getFor(FileMetaDataStrategy::REPORT_TYPE_STOCK, $partnerType);
         $fileMetaData = $this->fileMetaData->getFor($partnerType, FileMetaDataStrategy::REPORT_TYPE_STOCK);
 
         $writer->insertRecords(

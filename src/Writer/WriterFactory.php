@@ -18,11 +18,11 @@ class WriterFactory
         Ttoptions::class,
     ];
 
-    public function getFor(string $reportType): Writer
+    public function getFor(string $reportType, string $partnerType): Writer
     {
         foreach (self::WRITERS as $writer) {
             if ($writer::supports($reportType)) {
-                return new $writer();
+                return new $writer($partnerType);
             }
         }
 

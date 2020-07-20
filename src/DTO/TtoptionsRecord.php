@@ -10,6 +10,7 @@ namespace Spot\DTO;
  * @property-read string $clientName
  * @property-read string $clientAddress
  * @property-read string $okpo
+ * @property-read string|null $clientLegalAddress
  */
 class TtoptionsRecord
 {
@@ -18,18 +19,21 @@ class TtoptionsRecord
     public $clientName;
     public $clientAddress;
     public $okpo;
+    public $clientLegalAddress;
 
     public function __construct(
         int $distributorId,
         string $clientERPCode,
         string $clientName,
         string $clientAddress,
-        string $okpo
+        string $okpo,
+        ?string $clientLegalAddress = null
     ) {
         $this->distributorId = $distributorId;
         $this->clientERPCode = $clientERPCode;
         $this->clientName = $clientName;
         $this->clientAddress = $clientAddress;
         $this->okpo = $okpo;
+        $this->clientLegalAddress = $clientLegalAddress;
     }
 }

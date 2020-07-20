@@ -20,7 +20,8 @@ class ToTtoptions extends FromVenta
             'UID пункта доставки',
             'Клиент',
             'Адрес дост.',
-            'ОКПО'
+            'ОКПО',
+            'Адрес'
         ];
     }
 
@@ -34,7 +35,8 @@ class ToTtoptions extends FromVenta
             $record['UID пункта доставки'],
             $record['Клиент'],
             $record['Адрес дост.'],
-            $record['ОКПО']
+            $record['ОКПО'],
+            $record['Адрес']
         );
     }
 

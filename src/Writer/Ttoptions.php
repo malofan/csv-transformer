@@ -6,6 +6,7 @@ namespace Spot\Writer;
 
 use Spot\DTO\TtoptionsRecord;
 use Spot\ExportReportTypes;
+use Spot\PartnerTypes;
 
 class Ttoptions extends BaseWriter
 {
@@ -14,7 +15,7 @@ class Ttoptions extends BaseWriter
      */
     public function getHeader(): array
     {
-        return [
+        $header = [
             'id дистрибьютора',
             'Код клиента ERP',
             'Название клиента',
@@ -23,6 +24,12 @@ class Ttoptions extends BaseWriter
             'Адрес ТТ',
             'ОКПО'
         ];
+
+        if ($this->withLegalAddress()) {
+            $header[] = 'Юридический адрес клиента';
+        }
+
+        return $header;
     }
 
     /**
@@ -30,21 +37,30 @@ class Ttoptions extends BaseWriter
      */
     public function insertRecord($record): void // phpcs:ignore
     {
-        $this->writer->insertOne(
-            [
-                $record->distributorId,
-                $record->clientERPCode,
-                $record->clientName,
-                $record->clientAddress,
-                $record->clientName,
-                $record->clientAddress,
-                $record->okpo
-            ]
-        );
+        $arrayRecord = [
+            $record->distributorId,
+            $record->clientERPCode,
+            $record->clientName,
+            $record->clientAddress,
+            $record->clientName,
+            $record->clientAddress,
+            $record->okpo
+        ];
+
+        if ($this->withLegalAddress()) {
+            $arrayRecord[] = $record->clientLegalAddress;
+        }
+
+        $this->writer->insertOne($arrayRecord);
     }
 
     public static function supports(string $reportType): bool
     {
         return ExportReportTypes::TTOPTIONS === $reportType;
+    }
+
+    private function withLegalAddress(): bool
+    {
+        return in_array($this->partnerType, [PartnerTypes::BADM, PartnerTypes::VENTA], true);
     }
 }

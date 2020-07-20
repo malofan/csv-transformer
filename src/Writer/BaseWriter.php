@@ -12,14 +12,16 @@ abstract class BaseWriter implements WriterStrategy, Writer
 {
     protected $stream;
     protected $writer;
+    protected $partnerType;
 
     /**
      * @return string[]
      */
     abstract protected function getHeader(): array;
 
-    public function __construct()
+    public function __construct(string $partnerType)
     {
+        $this->partnerType = $partnerType;
         $this->stream = fopen('php://temp', 'rb+');
         $this->writer = LeagueWriter::createFromStream($this->stream);
         $this->writer->setDelimiter(';');
