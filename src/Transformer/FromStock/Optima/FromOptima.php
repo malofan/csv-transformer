@@ -42,7 +42,7 @@ abstract class FromOptima extends FromStockTransformer
         }
 
         $productCode = $record[array_search('Код товара', $header)];
-        $productName = $record[array_search('Код товара', $header)];
+        $productName = $record[array_search('Товар', $header)];
 
         foreach ($header as $index => $fieldName) {
             if (in_array($fieldName, ['Товар', 'Код товара', 'Все', ''], true)) {

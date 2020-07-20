@@ -19,7 +19,7 @@ class ToSku extends FromOptima
         int $index,
         string $distributorName
     ): SkuRecord {
-        return new SkuRecord($this->getDistributorIdBy($distributorName), $productCode, $productName, null, null, null);
+        return new SkuRecord($this->getDistributorIdBy($distributorName), $productCode, $productName, null, null, '1');
     }
 
     public function getType(): string

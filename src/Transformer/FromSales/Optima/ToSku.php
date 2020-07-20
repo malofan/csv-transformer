@@ -31,7 +31,7 @@ class ToSku extends FromOptima
             $record['Товар'],
             null,
             null,
-            null
+            '1'
         );
     }
 
